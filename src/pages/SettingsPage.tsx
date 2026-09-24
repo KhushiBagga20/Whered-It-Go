@@ -242,9 +242,14 @@ export default function SettingsPage() {
             Chill doubles her “that’s a lot” thresholds; strict halves them.
           </p>
         </div>
-        <Button variant="ghost" size="sm" onClick={() => react('poke')} disabled={!prefs.mascotVisible || !prefs.reactions}>
-          Poke her
-        </Button>
+        <div className={styles.buttons}>
+          <Button variant="ghost" size="sm" onClick={() => react('poke')} disabled={!prefs.mascotVisible || !prefs.reactions}>
+            Poke her
+          </Button>
+          <Link href="/mascot" className={styles.linkRow}>
+            See all her faces <ChevronRight size={18} />
+          </Link>
+        </div>
       </Panel>
 
       <Panel title="Motion">

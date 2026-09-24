@@ -12,7 +12,7 @@ export function Header() {
   const [path] = useLocation()
   const demo = useData((s) => s.demo)
   const pending = useData((s) => s.pending)
-  const showMonth = !path.startsWith('/settings')
+  const showMonth = !path.startsWith('/settings') && !path.startsWith('/mascot')
   return (
     <>
       {!desktop && (

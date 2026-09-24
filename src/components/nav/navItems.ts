@@ -16,6 +16,7 @@ export const NAV_ITEMS: NavItem[] = [
 
 export function navIndex(path: string): number {
   if (path.startsWith('/settings')) return NAV_ITEMS.length
+  if (path.startsWith('/mascot')) return NAV_ITEMS.length + 1
   const i = NAV_ITEMS.findIndex((n) => n.path === path)
   return i === -1 ? 0 : i
 }

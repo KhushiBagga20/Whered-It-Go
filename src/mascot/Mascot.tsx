@@ -1,13 +1,13 @@
 import { m, useReducedMotion, type TargetAndTransition } from 'motion/react'
 import { memo, useEffect, useId, useState } from 'react'
-import { assetFor } from './assets'
+import { POSE_RATIO, spriteFor, type Sprite } from './assets'
 import styles from './Mascot.module.css'
 import type { MascotAnimation, MascotExpression, MascotPose } from './types'
 
 /**
- * Tiny Khushi. A hand-drawn placeholder character, drawn in SVG so every
- * pose × expression combo works out of the box. Drop real sprites into
- * mascot/assets.ts and they replace the drawing automatically.
+ * Tiny Khushi. Uses the hand-drawn sprites in src/assets/mascot/ when they
+ * exist (see assets.ts); otherwise falls back to this SVG placeholder so
+ * every pose × expression works out of the box.
  */
 
 const INK = '#1a0c30'
@@ -330,6 +330,18 @@ function Drawing({
   )
 }
 
+/** Both frames stay mounted so the blink frame is already decoded when it's needed. */
+function SpriteImage({ sprite, blink }: { sprite: Sprite; blink: boolean }) {
+  return (
+    <>
+      <img src={sprite.src} alt="" className={styles.sprite} draggable={false} style={{ opacity: blink && sprite.blink ? 0 : 1 }} />
+      {sprite.blink && (
+        <img src={sprite.blink} alt="" className={styles.sprite} draggable={false} style={{ opacity: blink ? 1 : 0 }} />
+      )}
+    </>
+  )
+}
+
 export const Mascot = memo(function Mascot({
   pose = 'stand',
   expression = 'neutral',
@@ -342,9 +354,10 @@ export const Mascot = memo(function Mascot({
 }: MascotProps) {
   const filterId = `mascot-${useId().replace(/:/g, '')}`
   const reduced = useReducedMotion()
-  const sprite = assetFor(pose, expression)
-  const blink = useBlink(!sprite && !reduced)
-  const ratio = pose === 'peek' ? 92 / 76 : pose === 'stand' || pose === 'sit' ? 84 / 126 : 92 / 126
+  const sprite = spriteFor(pose, expression)
+  // Blink the SVG always, a sprite only if it came with a "-blink" frame.
+  const blink = useBlink(!reduced && (!sprite || Boolean(sprite.blink)))
+  const ratio = POSE_RATIO[pose]
   return (
     <div
       className={[styles.root, className].filter(Boolean).join(' ')}
@@ -361,7 +374,7 @@ export const Mascot = memo(function Mascot({
           style={{ transformOrigin: '50% 90%' }}
         >
           {sprite ? (
-            <img src={sprite} alt="" className={styles.svg} draggable={false} />
+            <SpriteImage sprite={sprite} blink={blink} />
           ) : (
             <Drawing pose={pose} expression={expression} look={look} filterId={filterId} blink={blink} />
           )}

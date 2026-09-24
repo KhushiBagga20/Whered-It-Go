@@ -28,9 +28,10 @@ Open the printed URL. With no Supabase keys the app runs **on-device** and loads
 
 1. Create a Supabase project.
 2. Run `supabase/migrations/20260923000000_init.sql` — paste it into **SQL Editor → Run**, or `supabase db push` with the CLI. It is idempotent.
-3. **Authentication → URL configuration**: set *Site URL* to your deployed URL (and add `http://localhost:5173` to redirect URLs for dev). Email + password and magic links both work; turn off “Confirm email” if you want to skip the confirmation step.
-4. Copy `.env.example` to `.env.local` and fill in `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (the public anon/publishable key — never the service-role key).
-5. Restart `npm run dev`. The app now asks you to sign in, then onboards you.
+3. If your project was created from an earlier copy of the init migration, also run `supabase/migrations/20260924000000_profiles_tracking_since.sql` (safe to run regardless).
+4. **Authentication → URL configuration**: set *Site URL* to your deployed URL (and add `http://localhost:5173` to redirect URLs for dev). Email + password and magic links both work; turn off “Confirm email” if you want to skip the confirmation step.
+5. Copy `.env.example` to `.env.local` and fill in `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (the public anon/publishable key — never the service-role key).
+6. Restart `npm run dev`. The app now asks you to sign in, then onboards you.
 
 Demo data never goes to Supabase. In cloud mode the last snapshot is cached on the device, so the app opens instantly and still reads offline; writes need a connection (a failed save rolls back and says why).
 
@@ -44,7 +45,7 @@ The migration was checked against real Postgres (PGlite) with a stubbed `auth` s
 
 A PWA only installs from **HTTPS** (or `localhost`).
 
-1. Deploy the build anywhere static: Vercel (`vercel.json` included) or Netlify (`public/_redirects` included). `npm run build` → `dist/`.
+1. Deploy the build anywhere static: Vercel (`vercel.json` included) or Netlify (`public/_redirects` included). `npm run build` → `dist/`. On Vercel: framework *Vite*, and add `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` under *Settings → Environment Variables* — they’re baked in at build time, so redeploy after changing them.
 2. Open the URL in Chrome or Samsung Internet → menu → **Install app / Add to Home screen**.
 3. It launches standalone with the purple splash, and long-pressing the icon offers **Add evidence** and **Calendar** shortcuts.
 
@@ -89,7 +90,7 @@ src/
 
 - **What she says** is data in [`src/mascot/reactions.ts`](src/mascot/reactions.ts): trigger, conditions (amount range, category, repeat count, streak, hour), messages, expression, animation, priority. Add a rule to add a reaction. *Settings → How judgy* doubles or halves the amount thresholds.
 - **Where she is**: pages declare `<MascotSpot>`s (sitting on the donut, peeking over the calendar, over the composer, in empty states). Only the most recent one shows her, so she moves around rather than duplicating; otherwise she sits on the hill (or in the side panel on wide screens). Tap her for a comment.
-- **Real artwork**: the character is a placeholder SVG. Drop images in `public/mascot/` and register them in [`src/mascot/assets.ts`](src/mascot/assets.ts) by `pose-expression` (e.g. `sit-judging`) — anything unregistered keeps the drawing.
+- **Real artwork**: the character is a placeholder SVG until hand-drawn frames exist. Export them to [`src/assets/mascot/`](src/assets/mascot/) as `pose-face.webp` (e.g. `sit-judging.webp`) and they’re used automatically; missing faces fall back to the pose’s neutral drawing. The full list, canvas sizes and drawing templates are in [docs/tiny-khushi-art-brief.md](docs/tiny-khushi-art-brief.md); `/mascot` shows every pose × face in place.
 
 ## Notifications
 

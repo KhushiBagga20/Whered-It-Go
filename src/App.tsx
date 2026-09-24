@@ -34,6 +34,7 @@ const CalendarPage = lazy(() => import('./pages/CalendarPage'))
 const HistoryPage = lazy(() => import('./pages/HistoryPage'))
 const MoneyPage = lazy(() => import('./pages/MoneyPage'))
 const SettingsPage = lazy(() => import('./pages/SettingsPage'))
+const MascotGallery = lazy(() => import('./pages/MascotGallery'))
 const AuthPage = lazy(() => import('./pages/AuthPage'))
 const Onboarding = lazy(() => import('./pages/Onboarding'))
 
@@ -157,6 +158,7 @@ function Shell() {
                   <Route path="/history" component={HistoryPage} />
                   <Route path="/money" component={MoneyPage} />
                   <Route path="/settings" component={SettingsPage} />
+                  <Route path="/mascot" component={MascotGallery} />
                   <Route>
                     <Dashboard />
                   </Route>

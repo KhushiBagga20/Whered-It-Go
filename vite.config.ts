@@ -48,7 +48,7 @@ export default defineConfig(({ mode }) => {
           ],
         },
         workbox: {
-          globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+          globPatterns: ['**/*.{js,css,html,svg,png,webp,avif,woff2}'],
           // Only precache what this build can use: Latin fonts, and the
           // Supabase SDK only when cloud sync is configured.
           globIgnores: ['**/*cyrillic*', '**/*vietnamese*', '**/*greek*', ...(cloud ? [] : ['**/supabase-sdk-*.js'])],
