@@ -1,0 +1,156 @@
+.page {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.head {
+  display: grid;
+  gap: 2px;
+  padding-top: var(--space-2);
+}
+
+.totalRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.total {
+  font-family: var(--font-display);
+  font-size: var(--text-hero);
+  font-weight: 800;
+  letter-spacing: -0.055em;
+  line-height: 0.95;
+  text-shadow: 0 3px 0 rgba(10, 2, 26, 0.35);
+}
+
+.mascot {
+  margin-bottom: -4px;
+}
+
+.sub {
+  font-family: var(--font-hand);
+  font-size: 1.25rem;
+  color: var(--sun-300);
+}
+
+.jar {
+  display: flex;
+  gap: 3px;
+  height: 34px;
+  padding: 3px;
+  border-radius: 14px;
+  background: var(--ink-900);
+  border: 2.5px solid var(--ink-900);
+  overflow: hidden;
+}
+
+.jarSeg {
+  display: flex;
+  align-items: center;
+  min-width: 6px;
+  flex-basis: 0;
+  padding: 0 10px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.jarLabel {
+  font-size: var(--text-xs);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-900);
+  white-space: nowrap;
+}
+
+.cards {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .cards {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 72px;
+  border-radius: 24px;
+  border: 2.5px dashed var(--on-sky-line-strong);
+  color: var(--on-sky-soft);
+  font-weight: 800;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.add:hover {
+  background: rgba(226, 211, 255, 0.06);
+  border-color: var(--sun-400);
+  color: var(--on-sky);
+}
+
+.start {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 10px 10px 10px 16px;
+  border-top: 2px dashed var(--on-sky-line-strong);
+  border-bottom: 2px dashed var(--on-sky-line-strong);
+  text-align: left;
+  color: var(--on-sky-soft);
+}
+
+.start strong {
+  color: var(--on-sky);
+}
+
+.adj {
+  color: var(--sun-300);
+}
+
+.startCta {
+  flex: none;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  background: rgba(226, 211, 255, 0.1);
+  font-weight: 800;
+  font-size: var(--text-sm);
+  color: var(--on-sky);
+}
+
+.sectionTitle {
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 6px;
+}
+
+.inTotal {
+  color: var(--received);
+}
+
+.list {
+  display: grid;
+  margin: 0 -10px;
+}
+
+.archived summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--on-sky-muted);
+}
+
+.archived .cards {
+  margin-top: 8px;
+}

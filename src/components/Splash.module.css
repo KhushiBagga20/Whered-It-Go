@@ -1,0 +1,23 @@
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-content);
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  text-align: center;
+  animation: fade-in 0.4s var(--ease-out) both;
+}
+
+.mascot {
+  margin-top: 12px;
+  opacity: 0.9;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}

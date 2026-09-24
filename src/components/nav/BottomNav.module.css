@@ -1,0 +1,75 @@
+.nav {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: var(--safe-bottom);
+  display: grid;
+  grid-template-columns: 1fr 1fr 84px 1fr 1fr;
+  grid-template-rows: 100%;
+  align-items: end;
+  height: var(--nav-h);
+  padding: 0 6px 6px;
+  pointer-events: auto;
+}
+
+.item {
+  display: grid;
+  justify-items: center;
+  align-content: end;
+  gap: 1px;
+  height: 100%;
+  min-width: 48px;
+  padding-bottom: 2px;
+  color: var(--ink-900);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.iconWrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 34px;
+}
+
+.blob {
+  position: absolute;
+  inset: 0;
+  background: var(--paper);
+  border: 2.5px solid var(--ink-900);
+  border-radius: 46% 54% 50% 50% / 60% 55% 45% 40%;
+  box-shadow: 0 3px 0 var(--ink-900);
+}
+
+.icon {
+  position: relative;
+  transition: transform 0.2s var(--ease-bounce);
+}
+
+.item:active .icon {
+  transform: scale(0.85);
+}
+
+.label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.item[aria-current='page'] .label {
+  font-weight: 900;
+}
+
+.add {
+  position: relative;
+  align-self: stretch;
+}
+
+/* the + floats up out of the row instead of making the row taller */
+.add > * {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  translate: -50% 0;
+}

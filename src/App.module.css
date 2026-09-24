@@ -1,0 +1,87 @@
+.shell {
+  position: relative;
+  z-index: var(--z-content);
+  min-height: 100dvh;
+  /* the sun's glow hangs off the edge; clip it without making a scroll container (sticky keeps working) */
+  overflow-x: clip;
+}
+
+.shell[data-desktop] {
+  display: grid;
+  grid-template-columns: 248px minmax(0, 1fr);
+}
+
+.shell[data-wide] {
+  grid-template-columns: 248px minmax(0, 1fr) 340px;
+}
+
+.main {
+  position: relative;
+  min-width: 0;
+}
+
+.sun {
+  position: absolute;
+  top: calc(var(--safe-top) + 92px);
+  right: -18px;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.shell[data-desktop] .sun {
+  top: 110px;
+  right: 24px;
+}
+
+.content {
+  position: relative;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 0 var(--gutter) calc(var(--hill-h) + 72px);
+  outline: none;
+}
+
+.shell[data-desktop] .content {
+  padding-bottom: calc(var(--hill-h) + 56px);
+}
+
+.loading {
+  min-height: 50vh;
+}
+
+.stage {
+  position: absolute;
+  left: 3%;
+  top: 0;
+  translate: 0 -76%;
+  pointer-events: auto;
+}
+
+.shell[data-desktop] .stage {
+  left: auto;
+  right: 7%;
+}
+
+.center {
+  position: relative;
+  z-index: var(--z-content);
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+}
+
+.skip {
+  position: absolute;
+  left: 12px;
+  top: -60px;
+  z-index: 100;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: var(--paper);
+  color: var(--ink-900);
+  font-weight: 800;
+}
+
+.skip:focus {
+  top: 12px;
+}

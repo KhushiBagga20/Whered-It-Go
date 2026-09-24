@@ -1,0 +1,41 @@
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: var(--space-5) var(--space-4);
+  text-align: center;
+}
+
+.title {
+  margin-top: 6px;
+  font-family: var(--font-hand);
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--sun-300);
+}
+
+.line {
+  max-width: 30ch;
+  font-size: var(--text-sm);
+  color: var(--on-sky-muted);
+}
+
+.empty[data-tone='paper'] .title {
+  color: var(--sky-700);
+}
+
+.empty[data-tone='paper'] .line {
+  color: var(--on-paper-muted);
+}
+
+.action {
+  margin-top: var(--space-2);
+}
+
+/* keeps the layout steady whether or not she's standing here right now */
+.mascot {
+  display: grid;
+  place-items: end center;
+  min-height: 24px;
+}

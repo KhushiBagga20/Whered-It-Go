@@ -1,0 +1,40 @@
+.wordmark {
+  display: inline-grid;
+  line-height: 1;
+}
+
+.name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.2rem;
+  letter-spacing: -0.035em;
+  font-variation-settings: 'wdth' 85;
+  color: var(--on-sky);
+  white-space: nowrap;
+}
+
+.apos {
+  color: var(--petal-400);
+}
+
+.it {
+  color: var(--sun-400);
+  font-style: italic;
+  padding-right: 0.02em;
+}
+
+.tag {
+  margin-top: 1px;
+  font-family: var(--font-hand);
+  font-size: 0.95rem;
+  color: var(--petal-300);
+}
+
+.lg .name {
+  font-size: clamp(2.4rem, 11vw, 3.4rem);
+}
+
+.lg .tag {
+  font-size: 1.5rem;
+  margin-top: 4px;
+}

@@ -1,0 +1,73 @@
+.page {
+  position: relative;
+  z-index: var(--z-content);
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: var(--space-5);
+  min-height: 100dvh;
+  padding: calc(var(--safe-top) + 40px) var(--gutter) 60px;
+}
+
+.brand {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.mascot {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+}
+
+.hi {
+  font-family: var(--font-hand);
+  font-size: 1.45rem;
+  color: var(--sun-300);
+  text-align: center;
+}
+
+.card {
+  width: min(100%, 400px);
+  padding: 20px;
+  background: var(--paper);
+  color: var(--on-paper);
+  border: 3px solid var(--ink-900);
+  border-radius: 28px;
+  box-shadow: 6px 8px 0 rgba(10, 2, 26, 0.45);
+}
+
+.error {
+  margin-top: 14px;
+}
+
+.detail {
+  margin-top: 4px;
+  font-size: var(--text-xs);
+  color: var(--on-paper-muted);
+  font-family: ui-monospace, Menlo, monospace;
+}
+
+.magic {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 8px;
+  color: var(--sky-600);
+  font-weight: 800;
+}
+
+.sent {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  text-align: center;
+  color: var(--sky-700);
+}
+
+.sent p {
+  color: var(--on-paper);
+  font-weight: 600;
+}

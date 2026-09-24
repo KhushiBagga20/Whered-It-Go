@@ -1,0 +1,38 @@
+.round {
+  display: grid;
+  place-items: center;
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: var(--action);
+  color: var(--ink-900);
+  border: 3px solid var(--ink-900);
+  box-shadow:
+    0 5px 0 var(--ink-900),
+    0 0 0 5px var(--paper);
+  pointer-events: auto;
+}
+
+.round:focus-visible {
+  outline-offset: 6px;
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 56px;
+  border-radius: var(--radius-pill);
+  background: var(--action);
+  color: var(--ink-900);
+  border: 3px solid var(--ink-900);
+  box-shadow: 0 5px 0 var(--ink-900);
+  font-weight: 900;
+  font-size: var(--text-lg);
+}
+
+.pill:hover {
+  background: var(--action-hover);
+}

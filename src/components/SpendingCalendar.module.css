@@ -1,0 +1,209 @@
+.wrap {
+  display: grid;
+  gap: 8px;
+}
+
+.weekdays,
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.weekdays span {
+  text-align: center;
+  font-size: var(--text-xs);
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: var(--on-sky-faint);
+}
+
+.pad {
+  aspect-ratio: 1 / 1.08;
+}
+
+.day {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  justify-items: center;
+  align-items: center;
+  aspect-ratio: 1 / 1.08;
+  min-height: 44px;
+  padding: 4px 2px;
+  color: var(--on-sky);
+  background: transparent;
+  border: 2px solid transparent;
+  transition: background 0.35s, border-color 0.35s, color 0.35s;
+}
+
+.num {
+  align-self: start;
+  justify-self: start;
+  margin-left: 5px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* before tracking / future: just an outline */
+.day[data-state='future'],
+.day[data-state='before'] {
+  border: 2px dashed rgba(226, 211, 255, 0.16);
+  color: var(--on-sky-faint);
+}
+
+.day[data-state='before'] {
+  opacity: 0.5;
+}
+
+/* calm: green, with a sprout */
+.day[data-state='calm'] {
+  background: var(--calm-day);
+  border-color: rgba(139, 255, 92, 0.35);
+}
+
+.sprout {
+  color: var(--grass-400);
+}
+
+/* spent: one-hue ramp, faint blush → loud rose */
+.day[data-state='spent'] {
+  border-color: rgba(255, 158, 199, 0.4);
+}
+
+.day[data-heat='1'] {
+  background: var(--heat-1);
+}
+.day[data-heat='2'] {
+  background: var(--heat-2);
+}
+.day[data-heat='3'] {
+  background: var(--heat-3);
+}
+.day[data-heat='4'] {
+  background: var(--heat-4);
+  color: var(--ink-900);
+  border-color: var(--ink-900);
+}
+.day[data-heat='5'] {
+  background: var(--heat-5);
+  color: var(--ink-900);
+  border-color: var(--ink-900);
+  box-shadow: 0 0 0 3px rgba(255, 42, 85, 0.35), 0 0 22px rgba(255, 42, 85, 0.45);
+}
+
+.amt {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+@media (min-width: 400px) {
+  .amt {
+    font-size: 0.8rem;
+  }
+}
+
+.day[data-today] {
+  outline: 3px solid var(--action);
+  outline-offset: 2px;
+}
+
+.day[data-today] .num::after {
+  content: '•';
+  margin-left: 2px;
+  color: var(--action);
+}
+
+.day:hover {
+  filter: brightness(1.12);
+}
+
+.day:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* money in: a little sun in the corner */
+.sun {
+  position: absolute;
+  top: -5px;
+  right: -4px;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--sun-400);
+  color: var(--ink-900);
+  border: 2px solid var(--ink-900);
+  box-shadow: 0 0 10px rgba(255, 210, 63, 0.7);
+}
+
+/* legend */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  font-size: var(--text-sm);
+  color: var(--on-sky-muted);
+}
+
+.legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.key {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--blob-a);
+  background: var(--calm-day);
+  color: var(--grass-400);
+  border: 1.5px solid rgba(139, 255, 92, 0.35);
+}
+
+.ramp {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.ramp span {
+  width: 12px;
+  height: 18px;
+  border-radius: 5px;
+}
+
+.ramp [data-heat='1'] {
+  background: var(--heat-1);
+}
+.ramp [data-heat='2'] {
+  background: var(--heat-2);
+}
+.ramp [data-heat='3'] {
+  background: var(--heat-3);
+}
+.ramp [data-heat='4'] {
+  background: var(--heat-4);
+}
+.ramp [data-heat='5'] {
+  background: var(--heat-5);
+}
+
+.keySun {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--sun-400);
+  color: var(--ink-900);
+  border: 2px solid var(--ink-900);
+}

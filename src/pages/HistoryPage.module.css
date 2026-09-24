@@ -1,0 +1,156 @@
+.page {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.head {
+  display: grid;
+  gap: 4px;
+  padding-top: var(--space-2);
+}
+
+.title {
+  font-size: 2.1rem;
+  font-weight: 800;
+  letter-spacing: -0.045em;
+}
+
+.controls {
+  display: grid;
+  gap: 10px;
+}
+
+.controls [role='radiogroup'] {
+  background: rgba(19, 7, 42, 0.5);
+  border-color: var(--on-sky-line-strong);
+}
+
+.controls [role='radio'] {
+  color: var(--on-sky-soft);
+}
+
+.controls [role='radio'][aria-checked='true'] {
+  color: var(--ink-900);
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 50px;
+  padding: 0 8px 0 16px;
+  border-radius: var(--radius-pill);
+  background: rgba(19, 7, 42, 0.5);
+  border: 1.5px solid var(--on-sky-line-strong);
+  color: var(--on-sky-muted);
+}
+
+.search:focus-within {
+  border-color: var(--sun-400);
+  box-shadow: 0 0 0 3px rgba(255, 210, 63, 0.25);
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  border: 0;
+  background: transparent;
+  color: var(--on-sky);
+  font-weight: 600;
+}
+
+.search input::placeholder {
+  color: var(--on-sky-faint);
+}
+
+.search input:focus {
+  outline: none;
+}
+
+.search input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.clear {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: var(--on-sky-soft);
+}
+
+.catChip {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 14px 0 6px;
+  border-radius: var(--radius-pill);
+  background: var(--paper);
+  color: var(--ink-900);
+  border: 2.5px solid var(--ink-900);
+  font-weight: 800;
+}
+
+.tally {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--on-sky-muted);
+}
+
+.out {
+  color: var(--spent);
+}
+
+.in {
+  color: var(--received);
+}
+
+.groups {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.group {
+  border-radius: 22px;
+  transition: background 0.6s, box-shadow 0.6s;
+}
+
+.group[data-focus] {
+  background: rgba(255, 210, 63, 0.08);
+  box-shadow: 0 0 0 2px rgba(255, 210, 63, 0.4);
+}
+
+.dayHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 10px 6px;
+  border-bottom: 2px dashed var(--on-sky-line-strong);
+  text-align: left;
+}
+
+.dayLabel {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.dayTotals {
+  display: flex;
+  gap: 10px;
+  font-weight: 800;
+  font-size: var(--text-sm);
+}
+
+.list {
+  display: grid;
+  padding-top: 4px;
+}

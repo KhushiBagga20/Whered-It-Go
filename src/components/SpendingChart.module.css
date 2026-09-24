@@ -1,0 +1,204 @@
+.wrap {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.chartBox {
+  position: relative;
+  width: min(100%, 290px);
+  aspect-ratio: 1;
+  margin: 0 auto;
+}
+
+/* she sits on the ring at about two o'clock, legs over the edge */
+.mascot {
+  position: absolute;
+  top: 1%;
+  right: 9%;
+  z-index: 2;
+}
+
+.svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.outline {
+  fill: none;
+  stroke: var(--on-sky-line-strong);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 6;
+  stroke-linecap: round;
+}
+
+.track {
+  fill: none;
+  stroke: rgba(226, 211, 255, 0.08);
+}
+
+.slice {
+  cursor: pointer;
+  pointer-events: stroke;
+}
+
+.center {
+  position: absolute;
+  inset: 26%;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  pointer-events: none;
+}
+
+.centerInner {
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+}
+
+.centerLabel {
+  font-size: var(--text-xs);
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--on-sky-muted);
+  max-width: 11ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.centerValue {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+}
+
+.centerShare {
+  font-family: var(--font-hand);
+  font-size: 1.1rem;
+  color: var(--sun-300);
+}
+
+.legend {
+  display: grid;
+  gap: 2px;
+}
+
+.legendItem {
+  border-radius: 20px;
+  transition: background 0.2s;
+}
+
+.legendItem[data-open] {
+  background: rgba(19, 7, 42, 0.45);
+}
+
+.legendRow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(24px, 0.45fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 52px;
+  padding: 6px 10px;
+  border-radius: 20px;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.legendRow:hover {
+  background: rgba(226, 211, 255, 0.06);
+}
+
+.legendName {
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bar {
+  height: 8px;
+  border-radius: 99px;
+  background: rgba(226, 211, 255, 0.1);
+  overflow: hidden;
+}
+
+.barFill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  transform-origin: 0 50%;
+}
+
+.legendAmount {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--text-lg);
+  letter-spacing: -0.02em;
+  min-width: 4.5ch;
+  text-align: right;
+}
+
+.chev {
+  color: var(--on-sky-faint);
+  transition: transform 0.25s var(--ease-bounce);
+}
+
+.legendItem[data-open] .chev {
+  transform: rotate(180deg);
+}
+
+.drill {
+  overflow: hidden;
+}
+
+.merchants {
+  display: grid;
+  gap: 2px;
+  padding: 2px 16px 4px 58px;
+}
+
+.merchants li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 0;
+  border-bottom: 1.5px dashed var(--on-sky-line);
+}
+
+.merchant {
+  font-weight: 600;
+  color: var(--on-sky-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.times {
+  color: var(--on-sky-faint);
+  font-size: var(--text-sm);
+}
+
+.merchantAmt {
+  font-weight: 800;
+}
+
+.seeAll {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  margin: 2px 0 6px 58px;
+  font-weight: 800;
+  font-size: var(--text-sm);
+  color: var(--sun-300);
+}
+
+.seeAll:hover {
+  color: var(--sun-200);
+}

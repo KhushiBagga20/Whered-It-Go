@@ -1,0 +1,191 @@
+/*
+ * Where'dItGo design tokens.
+ *
+ * The world: purple sky, neon grass, baby-pink flowers, a yellow sun,
+ * orange for anything you can press. Raw ramps first, then semantic
+ * tokens that components actually use.
+ */
+:root {
+  /* ── Sky (purple) ─────────────────────────────── */
+  --sky-950: #13072a;
+  --sky-900: #1c0a3a;
+  --sky-850: #240e4b;
+  --sky-800: #2d1260;
+  --sky-700: #3f1a82;
+  --sky-600: #5724a8;
+  --sky-500: #7b3fd1;
+  --sky-400: #a07af0;
+  --sky-300: #c6aafc;
+  --sky-200: #e2d3ff;
+  --sky-100: #f3ecff;
+
+  /* horizon glow where the sun sinks */
+  --dusk-500: #c65fd0;
+  --dusk-300: #f5a3d4;
+
+  /* ── Grass (neon green) ───────────────────────── */
+  --grass-950: #052a16;
+  --grass-900: #0a4221;
+  --grass-800: #10652b;
+  --grass-700: #178d33;
+  --grass-600: #27b93b;
+  --grass-500: #5fe03a;
+  --grass-400: #8bff5c;
+  --grass-300: #b8ff97;
+  --grass-200: #ddffcb;
+
+  /* ── Petal (baby pink) ────────────────────────── */
+  --petal-800: #8a1747;
+  --petal-700: #b3235e;
+  --petal-600: #e8479a;
+  --petal-500: #ff72ad;
+  --petal-400: #ff9ec7;
+  --petal-300: #ffc6de;
+  --petal-200: #ffe2ee;
+
+  /* ── Ember (orange) ───────────────────────────── */
+  --ember-800: #8f3a00;
+  --ember-700: #b84b00;
+  --ember-600: #e86200;
+  --ember-500: #ff7a1a;
+  --ember-400: #ff9b4f;
+  --ember-300: #ffbf8c;
+  --ember-200: #ffe1c8;
+
+  /* ── Sun (yellow) ─────────────────────────────── */
+  --sun-700: #a87400;
+  --sun-600: #e6a800;
+  --sun-500: #ffc400;
+  --sun-400: #ffd23f;
+  --sun-300: #ffe27f;
+  --sun-200: #fff2bf;
+
+  /* ── Neutrals: paper + ink ────────────────────── */
+  --cream-50: #fffbf4;
+  --cream-100: #fff5e6;
+  --cream-200: #f7ead6;
+  --cream-300: #eadbc4;
+  --ink-900: #1a0c30;
+  --ink-800: #271641;
+  --ink-700: #3b2a58;
+  --ink-600: #574878;
+  --ink-500: #76689a;
+  --ink-400: #9d91bb;
+
+  /* ── Semantic: text on the sky ────────────────── */
+  --on-sky: #fff6ea;
+  --on-sky-soft: rgba(255, 246, 234, 0.84);
+  --on-sky-muted: #c9b6ef;
+  --on-sky-faint: #a792d4;
+  --on-sky-line: rgba(226, 211, 255, 0.16);
+  --on-sky-line-strong: rgba(226, 211, 255, 0.28);
+
+  /* ── Semantic: text on paper (sheets, bubbles) ── */
+  --paper: var(--cream-50);
+  --paper-2: var(--cream-100);
+  --paper-3: var(--cream-200);
+  --on-paper: var(--ink-900);
+  --on-paper-soft: var(--ink-700);
+  --on-paper-muted: var(--ink-600);
+  --on-paper-line: rgba(39, 22, 65, 0.12);
+
+  /* ── Semantic: money ──────────────────────────── */
+  --spent: var(--petal-400);
+  --spent-strong: var(--petal-500);
+  --spent-ink: var(--petal-700);
+  --received: var(--grass-400);
+  --received-ink: var(--grass-800);
+  --action: var(--ember-500);
+  --action-hover: var(--ember-400);
+  --action-ink: var(--ink-900);
+  --focus: var(--sun-400);
+
+  /* Category palette. Fixed order; validated for adjacent
+     colour-blind separation on the sky surface. */
+  --cat-1: #ff7a1a;
+  --cat-2: #ff9ec7;
+  --cat-3: #ffd23f;
+  --cat-4: #e8479a;
+  --cat-5: #5fe03a;
+  --cat-6: #d08cff;
+  --cat-7: #ffa56b;
+  --cat-8: #a98bff;
+  --cat-9: #3fd2b8;
+  --cat-0: #cbbfd9;
+
+  /* Calendar spending ramp (one hue, dark sky → loud rose) */
+  --heat-1: #5a2168;
+  --heat-2: #8a2a74;
+  --heat-3: #c2336f;
+  --heat-4: #ef3f6b;
+  --heat-5: #ff2a55;
+  --calm-day: #1f5a3a;
+
+  /* ── Type ─────────────────────────────────────── */
+  --font-display: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Figtree Variable', 'Figtree', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-hand: 'Caveat', 'Segoe Print', 'Bradley Hand', cursive;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --text-hero: clamp(2.9rem, 13.5vw, 4.25rem);
+
+  /* ── Space, shape, depth ──────────────────────── */
+  --gutter: 16px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-pill: 999px;
+  --blob-a: 46% 54% 52% 48% / 55% 46% 54% 45%;
+  --blob-b: 55% 45% 41% 59% / 47% 56% 44% 53%;
+  --blob-c: 42% 58% 60% 40% / 52% 40% 60% 48%;
+
+  --shadow-soft: 0 10px 30px -12px rgba(10, 2, 26, 0.55);
+  --shadow-pop: 0 6px 0 0 rgba(10, 2, 26, 0.35);
+  --shadow-sheet: 0 -20px 60px -20px rgba(10, 2, 26, 0.6);
+
+  /* ── Motion ───────────────────────────────────── */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* ── Layout ───────────────────────────────────── */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --hill-h: calc(104px + var(--safe-bottom));
+  --nav-h: 64px;
+  --content-max: 640px;
+
+  --z-world: 0;
+  --z-content: 10;
+  --z-hill: 20;
+  --z-nav: 30;
+  --z-header: 25;
+  --z-sheet: 60;
+  --z-toast: 80;
+  --z-burst: 90;
+
+  color-scheme: dark;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --gutter: 28px;
+    --hill-h: 120px;
+    --content-max: 760px;
+    --text-hero: clamp(3.5rem, 5vw, 4.75rem);
+  }
+}

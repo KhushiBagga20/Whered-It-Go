@@ -1,0 +1,134 @@
+.page {
+  position: relative;
+  z-index: var(--z-content);
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: var(--space-5);
+  min-height: 100dvh;
+  padding: calc(var(--safe-top) + 24px) var(--gutter) 80px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.intro {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  max-width: 420px;
+  text-align: center;
+}
+
+.title {
+  font-family: var(--font-hand);
+  font-size: 2.3rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--sun-300);
+}
+
+.lede {
+  color: var(--on-sky-soft);
+}
+
+.card {
+  width: min(100%, 440px);
+  padding: 22px 20px;
+  background: var(--paper);
+  color: var(--on-paper);
+  border: 3px solid var(--ink-900);
+  border-radius: 28px;
+  box-shadow: 6px 8px 0 rgba(10, 2, 26, 0.45);
+}
+
+.sources {
+  display: grid;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.source {
+  display: grid;
+  grid-template-columns: auto 1fr auto minmax(0, 8.5rem);
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+  padding: 6px 12px 6px 8px;
+  border-radius: 18px;
+  border: 2.5px solid var(--ink-900);
+  background: #fff;
+}
+
+.source:focus-within {
+  box-shadow: 0 0 0 4px var(--sun-300);
+}
+
+.sourceIcon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--blob-a);
+  border: 2px solid var(--ink-900);
+}
+
+.sourceLabel {
+  font-weight: 800;
+}
+
+.rupee {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.3rem;
+  color: var(--on-paper-muted);
+}
+
+.sourceInput {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-align: right;
+  color: var(--on-paper);
+}
+
+.sourceInput:focus {
+  outline: none;
+}
+
+.total {
+  margin-top: 8px;
+  text-align: right;
+  color: var(--on-paper-soft);
+}
+
+.total strong {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--on-paper);
+}
+
+.error {
+  margin-top: 14px;
+}
+
+.detail {
+  margin-top: 4px;
+  font-size: var(--text-xs);
+  font-family: ui-monospace, Menlo, monospace;
+  color: var(--on-paper-muted);
+}
+
+.local {
+  margin-top: 10px;
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--on-paper-muted);
+}

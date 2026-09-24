@@ -1,0 +1,151 @@
+.world {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-world);
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+
+.sky {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    var(--sky-950) 0%,
+    var(--sky-900) 16%,
+    var(--sky-850) 34%,
+    var(--sky-800) 52%,
+    var(--sky-700) 70%,
+    #6327a6 80%,
+    var(--dusk-500) 88%,
+    var(--dusk-300) 100%
+  );
+}
+
+/* the horizon glow breathes very slowly */
+.glow {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: 18vh;
+  height: 26vh;
+  background: radial-gradient(ellipse at 50% 100%, rgba(245, 163, 212, 0.55), rgba(198, 95, 208, 0) 70%);
+  animation: breathe 9s var(--ease-in-out) infinite alternate;
+  will-change: opacity;
+}
+
+.sparkle {
+  position: absolute;
+  opacity: 0.2;
+  animation: twinkle 4s var(--ease-in-out) infinite alternate;
+}
+
+.cloud {
+  position: absolute;
+  left: 0;
+  opacity: 0.22;
+  will-change: transform;
+  animation: drift linear infinite;
+}
+
+.cloudA {
+  top: 13vh;
+  animation-duration: 110s;
+  animation-delay: -30s;
+}
+
+.cloudB {
+  top: 30vh;
+  scale: 0.7;
+  opacity: 0.16;
+  animation-duration: 150s;
+  animation-delay: -95s;
+}
+
+.hills {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: min(36vh, 340px);
+}
+
+.petal {
+  position: absolute;
+  bottom: 22vh;
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: float linear infinite;
+}
+
+.gust {
+  position: absolute;
+  inset: 0;
+}
+
+.gustPetal {
+  position: absolute;
+  left: -20px;
+  animation: whoosh 1.3s var(--ease-out) both;
+}
+
+@keyframes breathe {
+  from {
+    opacity: 0.65;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes twinkle {
+  from {
+    opacity: 0.15;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 0.85;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translateX(-220px);
+  }
+  to {
+    transform: translateX(calc(100vw + 40px));
+  }
+}
+
+@keyframes float {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(0deg);
+  }
+  10% {
+    opacity: 0.8;
+  }
+  85% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(18vw, -70vh) rotate(420deg);
+  }
+}
+
+@keyframes whoosh {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(0deg);
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(100vw + 60px), -40px) rotate(540deg);
+  }
+}

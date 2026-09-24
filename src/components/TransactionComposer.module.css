@@ -1,0 +1,104 @@
+.form {
+  padding-top: 4px;
+}
+
+.peek {
+  position: absolute;
+  top: -50px;
+  right: 34px;
+  z-index: 2;
+}
+
+.amountWrap {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px;
+  margin-top: var(--space-5);
+  padding: 4px 0 2px;
+  border-bottom: 3px dashed var(--on-paper-line);
+}
+
+.sign {
+  flex: none;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 2.2rem;
+  letter-spacing: -0.04em;
+  transition: color 0.2s;
+}
+
+.amountWrap[data-type='expense'] .sign {
+  color: var(--petal-700);
+}
+
+.amountWrap[data-type='income'] .sign {
+  color: var(--grass-800);
+}
+
+.amount {
+  width: 100%;
+  max-width: 8.5ch;
+  min-width: 2ch;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  color: var(--on-paper);
+  caret-color: var(--action);
+  field-sizing: content;
+  transition: font-size 0.2s var(--ease-out);
+}
+
+.amount::placeholder {
+  color: var(--cream-300);
+}
+
+.amount:focus {
+  outline: none;
+}
+
+.amountWrap:focus-within {
+  border-bottom-color: var(--action);
+}
+
+.center {
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.suggestion {
+  background: var(--paper-2);
+}
+
+.newChip {
+  border-style: dashed;
+}
+
+.noteToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 4px;
+  color: var(--sky-600);
+  font-weight: 800;
+}
+
+.noteToggle:hover {
+  color: var(--sky-700);
+}
+
+.overdraft {
+  overflow: hidden;
+  margin-bottom: 10px;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--petal-700);
+  text-align: center;
+}
