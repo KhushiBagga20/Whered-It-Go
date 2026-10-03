@@ -1,0 +1,6 @@
+# Minimal Supabase CLI config for this repo. Only the bits that matter for
+# deploying: the pin-login function must accept callers who aren't signed in.
+project_id = "whereditgo"
+
+[functions.pin-login]
+verify_jwt = false
