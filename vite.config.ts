@@ -13,7 +13,9 @@ export default defineConfig(({ mode }) => {
       VitePWA({
         registerType: 'prompt',
         injectRegister: false,
-        includeAssets: ['favicon.svg', 'favicon.ico', 'apple-touch-icon-180x180.png'],
+        // App icon files live in public/icons/ (placeholders until the real icon
+        // lands — see docs/app-icon.md; `npm run icons` regenerates them).
+        includeAssets: ['icons/favicon-32.png', 'icons/favicon-64.png', 'icons/apple-touch-icon.png'],
         manifest: {
           id: '/',
           name: 'Where’dItGo — Love & Loss™',
@@ -23,27 +25,28 @@ export default defineConfig(({ mode }) => {
           start_url: '/',
           scope: '/',
           display: 'standalone',
-          orientation: 'portrait',
+          // 'any': the unfolded Fold is nearly square and works in landscape too
+          orientation: 'any',
           background_color: '#1c0a3a',
           theme_color: '#13072a',
           categories: ['finance', 'lifestyle'],
           icons: [
-            { src: 'pwa-64x64.png', sizes: '64x64', type: 'image/png' },
-            { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
-            { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' },
-            { src: 'maskable-icon-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+            { src: 'icons/favicon-64.png', sizes: '64x64', type: 'image/png' },
+            { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+            { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+            { src: 'icons/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
           ],
           shortcuts: [
             {
               name: 'Add evidence',
               short_name: 'Add',
               url: '/?add=expense',
-              icons: [{ src: 'pwa-192x192.png', sizes: '192x192' }],
+              icons: [{ src: 'icons/icon-192.png', sizes: '192x192' }],
             },
             {
               name: 'Calendar',
               url: '/calendar',
-              icons: [{ src: 'pwa-192x192.png', sizes: '192x192' }],
+              icons: [{ src: 'icons/icon-192.png', sizes: '192x192' }],
             },
           ],
         },

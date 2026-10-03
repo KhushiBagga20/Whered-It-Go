@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- DEVELOPMENT PLACEHOLDER — replace with the real icon (see docs/app-icon.md). -->
+  <rect width="1024" height="1024" fill="#2d1260"/>
+  <rect x="112" y="112" width="800" height="800" rx="96" fill="none" stroke="#fff6ea" stroke-width="12" stroke-dasharray="40 28" opacity="0.55"/>
+  <text x="512" y="600" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-weight="800" font-size="330" fill="#fff6ea">W?</text>
+  <text x="512" y="760" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-weight="700" font-size="64" letter-spacing="8" fill="#ffd23f">ICON TBD</text>
+</svg>

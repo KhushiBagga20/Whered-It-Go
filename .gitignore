@@ -31,3 +31,7 @@ dev-dist
 
 # local tooling
 .claude/
+
+# Supabase CLI local state (project ref, pooler url)
+supabase/.temp/
+supabase/.branches/
