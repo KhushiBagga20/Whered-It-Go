@@ -124,7 +124,7 @@ The CSP allows `https://*.supabase.co` and `wss://*.supabase.co`. **If you ever 
 
 Open the Vercel URL in Chrome or Samsung Internet, then use the menu → **Install app** (or **Add to Home screen**). Each of you picks yourself (🌻 / 🌸) and enters your PIN once.
 
-When a new version is deployed, the app shows *“A fresh version of the meadow is ready.”*; tap **Reload**.
+When a new version is deployed, the app shows *“A fresh version of the meadow is ready.”* the next time it’s opened. The message stays on screen (on the login screen too) until you tap **Reload**.
 
 ## Check it worked
 

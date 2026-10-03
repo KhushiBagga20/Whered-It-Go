@@ -3,11 +3,14 @@ import { CircleAlert, Check, X } from 'lucide-react'
 import { ui, useUi } from '../state/ui'
 import styles from './Toasts.module.css'
 
-/** Little paper slips that slide in above the hill. Errors keep their technical detail visible. */
-export function Toasts() {
+/**
+ * Little paper slips that slide in above the hill. Errors keep their technical detail visible.
+ * `top` is for screens without the bottom nav (login, onboarding), where the bottom is a keypad or form.
+ */
+export function Toasts({ top = false }: { top?: boolean }) {
   const toasts = useUi((s) => s.toasts)
   return (
-    <div className={styles.stack} role="region" aria-label="Notifications">
+    <div className={styles.stack} data-top={top || undefined} role="region" aria-label="Notifications">
       <AnimatePresence initial={false}>
         {toasts.map((t) => (
           <m.div

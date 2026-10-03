@@ -11,6 +11,11 @@
   pointer-events: none;
 }
 
+.stack[data-top] {
+  top: calc(var(--safe-top) + 12px);
+  bottom: auto;
+}
+
 .toast {
   display: flex;
   align-items: center;

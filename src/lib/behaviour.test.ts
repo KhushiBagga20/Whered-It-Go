@@ -1,8 +1,9 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { buildDefaultAccounts, buildDefaultCategories } from '../data/defaults'
 import { buildDemoSnapshot } from '../data/demo'
 import { expressionForAmount, pickReaction } from '../mascot/engine'
 import { REACTIONS } from '../mascot/reactions'
+import { ui, useUi } from '../state/ui'
 import { transactionsToCsv } from './export'
 import { hasErrors, validateName, validateTransaction } from './validation'
 
@@ -157,5 +158,23 @@ describe('CSV export', () => {
     expect(row).toContain('large fries were NOT necessary.')
     // negative amounts are numbers, not text — left alone
     expect(row).toMatch(/,-320\.00,/)
+  })
+})
+
+describe('toasts', () => {
+  it('a sticky toast outlives its timeout and newer toasts', () => {
+    vi.useFakeTimers()
+    vi.stubGlobal('window', globalThis)
+    useUi.setState({ toasts: [] })
+    const update = ui.toast('new version', { sticky: true })
+    for (const n of [1, 2, 3, 4]) ui.toast(`toast ${n}`)
+    // ordinary slips are still capped at three; the sticky one is never the one dropped
+    expect(useUi.getState().toasts.map((t) => t.message)).toEqual(['new version', 'toast 2', 'toast 3', 'toast 4'])
+    vi.advanceTimersByTime(60_000)
+    expect(useUi.getState().toasts.map((t) => t.message)).toEqual(['new version'])
+    ui.dismissToast(update)
+    expect(useUi.getState().toasts).toEqual([])
+    vi.unstubAllGlobals()
+    vi.useRealTimers()
   })
 })

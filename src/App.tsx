@@ -84,6 +84,8 @@ export default function App() {
         </Suspense>
         {status === 'waiting' && <WaitingForJais />}
         {status === 'ready' && <Shell />}
+        {/* outside the shell so the "new version" slip also shows before sign-in */}
+        <Toasts top={status !== 'ready'} />
       </MotionConfig>
     </LazyMotion>
   )
@@ -174,7 +176,6 @@ function Shell() {
       <TransactionComposer />
       <TransactionDetail />
       <DaySheet />
-      <Toasts />
       <BurstLayer />
       <div className="sr-only" aria-live="polite">
         {reaction?.message}

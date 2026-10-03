@@ -9,6 +9,8 @@ export interface Toast {
   tone: 'info' | 'error' | 'success'
   detail?: string
   action?: { label: string; run: () => void }
+  /** Stays until it's tapped or dismissed, and newer toasts never push it out. */
+  sticky?: boolean
 }
 
 export interface ActiveReaction {
@@ -102,10 +104,14 @@ export const ui = {
   },
   toast(message: string, opts: Partial<Omit<Toast, 'id' | 'message'>> = {}) {
     const id = seq++
-    const toast: Toast = { id, message, tone: opts.tone ?? 'info', detail: opts.detail, action: opts.action }
-    useUi.setState((s) => ({ toasts: [...s.toasts.slice(-2), toast] }))
-    const ttl = toast.tone === 'error' ? 9000 : toast.action ? 6000 : 3200
-    window.setTimeout(() => ui.dismissToast(id), ttl)
+    const toast: Toast = { id, message, tone: opts.tone ?? 'info', detail: opts.detail, action: opts.action, sticky: opts.sticky }
+    useUi.setState((s) => ({
+      toasts: [...s.toasts.filter((t) => t.sticky), ...s.toasts.filter((t) => !t.sticky).slice(-2), toast],
+    }))
+    if (!toast.sticky) {
+      const ttl = toast.tone === 'error' ? 9000 : toast.action ? 6000 : 3200
+      window.setTimeout(() => ui.dismissToast(id), ttl)
+    }
     return id
   },
   dismissToast(id: number) {
