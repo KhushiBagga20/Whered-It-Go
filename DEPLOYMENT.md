@@ -183,10 +183,11 @@ npm run build
 
 ## The app icon
 
-The icons in `public/icons/` are **placeholders** (“W? / ICON TBD”). To ship the real one:
+The icon lives at `icon-source/icon.png`; every size the app uses is built from it into `public/icons/`. To change it:
 
-1. Save it as `icon-source/icon.png` (1024×1024, square).
-2. Optionally save `icon-source/icon-maskable.png`, with its important parts inside the middle 80% circle.
-3. Run `npm run icons`.
+1. Replace `icon-source/icon.png` (1024×1024, square).
+2. Run `npm run icons`.
+3. If the background colour changed, put the new one in `background_color` in `vite.config.ts` (the script prints it).
+4. Commit and push.
 
 Full details are in [docs/app-icon.md](docs/app-icon.md).

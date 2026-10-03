@@ -13,9 +13,12 @@ export default defineConfig(({ mode }) => {
       VitePWA({
         registerType: 'prompt',
         injectRegister: false,
-        // App icon files live in public/icons/ (placeholders until the real icon
-        // lands — see docs/app-icon.md; `npm run icons` regenerates them).
+        // App icon files live in public/icons/, built from icon-source/icon.png
+        // by `npm run icons` (see docs/app-icon.md).
         includeAssets: ['icons/favicon-32.png', 'icons/favicon-64.png', 'icons/apple-touch-icon.png'],
+        // The big home-screen icons are fetched by the OS at install time; the app
+        // never draws them, so they don't belong in the offline cache.
+        includeManifestIcons: false,
         manifest: {
           id: '/',
           name: 'Where’dItGo — Love & Loss™',
@@ -27,7 +30,8 @@ export default defineConfig(({ mode }) => {
           display: 'standalone',
           // 'any': the unfolded Fold is nearly square and works in landscape too
           orientation: 'any',
-          background_color: '#1c0a3a',
+          // the icon's own purple, so the Android splash shows no square around it
+          background_color: '#240e45',
           theme_color: '#13072a',
           categories: ['finance', 'lifestyle'],
           icons: [
@@ -52,9 +56,15 @@ export default defineConfig(({ mode }) => {
         },
         workbox: {
           globPatterns: ['**/*.{js,css,html,svg,png,webp,avif,woff2}'],
-          // Only precache what this build can use: Latin fonts, and the
-          // Supabase SDK only when cloud sync is configured.
-          globIgnores: ['**/*cyrillic*', '**/*vietnamese*', '**/*greek*', ...(cloud ? [] : ['**/supabase-sdk-*.js'])],
+          // Only precache what this build can use: Latin fonts, the Supabase SDK
+          // only when cloud sync is configured, and not the home-screen icons.
+          globIgnores: [
+            '**/*cyrillic*',
+            '**/*vietnamese*',
+            '**/*greek*',
+            'icons/icon-*.png',
+            ...(cloud ? [] : ['**/supabase-sdk-*.js']),
+          ],
           navigateFallback: '/index.html',
           cleanupOutdatedCaches: true,
         },
