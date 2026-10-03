@@ -6,6 +6,8 @@
 //                                   Without it, icon.png is shrunk into the safe zone
 //                                   on its own background colour.
 //
+// Also writes src/assets/logo.webp, the small logo shown inside the app.
+//
 // See docs/app-icon.md.
 import { existsSync } from 'node:fs'
 import sharp from 'sharp'
@@ -29,6 +31,17 @@ async function maskable(size) {
   return sharp({ create: { width: size, height: size, channels: 3, background } }).composite([{ input: art, gravity: 'centre' }])
 }
 
+// The in-app logo (header, login, splash) is shown as small as 34px, so it keeps
+// only the central part of the icon: the empty margin goes, the art stays whole.
+const LOGO_KEEP = 0.86
+async function logo(size) {
+  const full = 1024
+  const keep = Math.round(full * LOGO_KEEP)
+  const off = Math.round((full - keep) / 2)
+  const big = await render(src, full).flatten({ background }).png().toBuffer()
+  return sharp(big).extract({ left: off, top: off, width: keep, height: keep }).resize(size, size)
+}
+
 const jobs = [
   ['public/icons/icon-192.png', render(src, 192)],
   ['public/icons/icon-512.png', render(src, 512)],
@@ -44,3 +57,6 @@ for (const [to, img] of jobs) {
   await img.png({ compressionLevel: 9 }).toFile(to)
   console.log('wrote', to)
 }
+// 216px = the largest in-app size (72) on a 3× screen
+await (await logo(216)).webp({ quality: 92 }).toFile('src/assets/logo.webp')
+console.log('wrote', 'src/assets/logo.webp')

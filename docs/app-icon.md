@@ -28,6 +28,8 @@ That writes every size the app uses into `public/icons/`:
 | `apple-touch-icon.png` | 180 | iPhone / iPad home screen (made opaque) |
 | `favicon-32.png`, `favicon-64.png` | 32, 64 | browser tab |
 
+It also writes `src/assets/logo.webp`, the small logo inside the app (header, login, splash). That one keeps only the central 86% of the icon, so the drawing is bigger at 34px; nothing but empty margin is trimmed.
+
 Rebuild and deploy. Installed phones pick up the new icon on their next update; on some Android launchers you have to remove the app and install it again.
 
 ## Maskable icon tips
