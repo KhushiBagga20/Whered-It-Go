@@ -73,3 +73,18 @@
   bottom: 10px;
   translate: -50% 0;
 }
+
+/* cover screen: a little tighter so five targets still fit comfortably */
+@media (max-width: 419px) {
+  .nav {
+    grid-template-columns: 1fr 1fr 76px 1fr 1fr;
+    padding: 0 2px 6px;
+  }
+  .iconWrap {
+    width: 46px;
+  }
+  .label {
+    font-size: 0.68rem;
+    letter-spacing: 0;
+  }
+}

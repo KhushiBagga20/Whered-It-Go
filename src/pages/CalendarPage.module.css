@@ -116,3 +116,30 @@ button.fact:hover {
   background: var(--sun-400);
   border: 2px solid var(--ink-900);
 }
+
+/* Unfolded Fold / desktop: calendar on the left, the story on the right */
+@container content (min-width: 760px) {
+  .page {
+    grid-template-columns: minmax(0, 1.5fr) minmax(240px, 1fr);
+    column-gap: var(--col-gap);
+    align-items: start;
+  }
+  .head {
+    grid-column: 1 / -1;
+  }
+  .calendarBox {
+    grid-column: 1;
+    grid-row: 2 / span 4;
+  }
+  .page > :not(.head):not(.calendarBox) {
+    grid-column: 2;
+  }
+  .facts {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .fact {
+    border-left: 0;
+    padding: 0;
+  }
+}

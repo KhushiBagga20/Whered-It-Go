@@ -9,6 +9,7 @@ import {
   calculateDailySpending,
   calculateMonthlyIncome,
   calculateMonthlySpending,
+  calculateMonthlySummary,
   calculateNoSpendStreak,
   calculateSpendingIntensity,
   calculateStartingBalance,
@@ -174,5 +175,32 @@ describe('money helpers', () => {
     expect(parseAmount('₹ 320.5')).toBe(320.5)
     expect(parseAmount('abc')).toBeNaN()
     expect(sanitizeAmountInput('0012.345.6')).toBe('12.34')
+  })
+})
+
+describe('monthly recap', () => {
+  it('September 2026 as seen on the 23rd', () => {
+    const r = calculateMonthlySummary(ledger, demo.categories, '2026-09', '2026-09-23', '2026-08-01')
+    expect(r).toMatchObject({ cameIn: 2000, wentMissing: 2430, survived: -430, stillGot: 7570, startedWith: 8000 })
+    expect(r.mostExpensiveCategory?.category.name).toBe('Food')
+    expect(r.mostExpensiveCategory?.total).toBe(820)
+    expect(r.mostExpensiveDay).toEqual({ date: '2026-09-23', spent: 720 })
+    expect(r.mostPeacefulDay).toEqual({ date: '2026-09-22', spent: 0 })
+    // Shopping went from ₹0 in August to ₹620: the biggest jump
+    expect(r.mostSuspiciousCategory).toMatchObject({ reason: 'jump', detail: 620 })
+    expect(r.mostSuspiciousCategory?.category.name).toBe('Shopping')
+    expect(r.spendDays + r.calmDays).toBe(23)
+  })
+
+  it('falls back to the most frequent category with no previous month', () => {
+    const r = calculateMonthlySummary(ledger, demo.categories, '2026-08', '2026-09-23', '2026-08-01')
+    expect(r.mostSuspiciousCategory?.reason).toBe('frequent')
+    expect(r.survived).toBe(-2600)
+    expect(r.mostPeacefulDay?.spent).toBe(0)
+  })
+
+  it('an empty future month has nothing to say', () => {
+    const r = calculateMonthlySummary(ledger, demo.categories, '2026-10', '2026-09-23', '2026-08-01')
+    expect(r).toMatchObject({ cameIn: 0, wentMissing: 0, mostExpensiveCategory: null, mostExpensiveDay: null, mostPeacefulDay: null })
   })
 })

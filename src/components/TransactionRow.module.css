@@ -101,3 +101,17 @@
 .row[data-tone='paper'] .time {
   color: var(--on-paper-muted);
 }
+
+/* Khushi commented: a tiny pink speech mark, nothing louder */
+.khushi {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 4px;
+  padding: 1px 6px;
+  border-radius: 99px;
+  background: var(--petal-400);
+  color: var(--ink-900);
+  font-size: 0.68rem;
+  font-weight: 900;
+}

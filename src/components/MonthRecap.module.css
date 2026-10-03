@@ -1,0 +1,116 @@
+/* A paper receipt with a torn bottom edge, slightly crooked on the sky. */
+.receipt {
+  position: relative;
+  padding: 18px 18px 30px;
+  background: var(--paper);
+  color: var(--on-paper);
+  border: 2.5px solid var(--ink-900);
+  border-bottom: 0;
+  border-radius: 18px 18px 0 0;
+  box-shadow: 5px 6px 0 rgba(10, 2, 26, 0.35);
+  --tear: 12px;
+  mask:
+    linear-gradient(#000 0 0) top / 100% calc(100% - var(--tear)) no-repeat,
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / calc(var(--tear) * 2) var(--tear) repeat-x;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--on-paper-muted);
+}
+
+.big {
+  display: grid;
+  gap: 2px;
+  margin: 10px 0 14px;
+  padding-bottom: 12px;
+  border-bottom: 2px dashed var(--on-paper-line);
+  font-weight: 600;
+  color: var(--on-paper-soft);
+}
+
+.big strong {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--on-paper);
+}
+
+.big .in {
+  color: var(--received-ink);
+}
+
+.big .out {
+  color: var(--spent-ink);
+}
+
+.big li[data-tone='bad'] strong {
+  color: var(--spent-ink);
+}
+
+.facts {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.facts > div {
+  display: grid;
+  gap: 2px;
+}
+
+.facts dt {
+  font-size: var(--text-xs);
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--on-paper-muted);
+}
+
+.facts dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-weight: 700;
+}
+
+.why {
+  width: 100%;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--on-paper-muted);
+}
+
+.dayLink {
+  font-weight: 800;
+  text-decoration: underline dotted var(--ink-400);
+  text-underline-offset: 3px;
+}
+
+.remark {
+  margin-top: 14px;
+  font-family: var(--font-hand);
+  font-size: 1.45rem;
+  line-height: 1.1;
+  color: var(--sky-700);
+}
+
+.sig {
+  font-size: 1.1rem;
+  color: var(--petal-700);
+  white-space: nowrap;
+}
+
+@container content (min-width: 560px) {
+  .facts {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 18px;
+  }
+}

@@ -420,3 +420,97 @@ export function earliestMonth(txns: readonly Transaction[], startMonth: MonthKey
   }
   return earliest
 }
+
+// ── Monthly recap ─────────────────────────────────────────────────────
+
+export interface MonthlySummary {
+  month: MonthKey
+  startedWith: number
+  cameIn: number
+  wentMissing: number
+  /** came in − went missing (negative when more left than arrived). */
+  survived: number
+  stillGot: number
+  spendDays: number
+  calmDays: number
+  transactionCount: number
+  mostExpensiveCategory: { category: Category; total: number } | null
+  mostExpensiveDay: { date: DateKey; spent: number } | null
+  /** A day with nothing spent if there was one, else the cheapest spending day. */
+  mostPeacefulDay: { date: DateKey; spent: number } | null
+  /**
+   * The category that grew the most since last month, or — with nothing to
+   * compare against — the one he kept going back to.
+   */
+  mostSuspiciousCategory: {
+    category: Category
+    total: number
+    reason: 'jump' | 'frequent'
+    /** rupees up from last month, or number of transactions */
+    detail: number
+  } | null
+}
+
+export function calculateMonthlySummary(
+  ledger: Ledger,
+  categories: readonly Category[],
+  month: MonthKey,
+  today: DateKey,
+  trackingStart: DateKey,
+): MonthlySummary {
+  const summary = summarizeMonth(ledger, month)
+  const slices = calculateCategorySpending(ledger.transactions, month, categories)
+  const days = calculateDailySpending(ledger.transactions, month)
+  const insights = calculateMonthInsights(days, slices, today, trackingStart)
+
+  let peaceful: { date: DateKey; spent: number } | null = null
+  let cheapest: { date: DateKey; spent: number } | null = null
+  for (const day of days.values()) {
+    if (day.date > today || day.date < trackingStart) continue
+    if (day.spent === 0) peaceful = { date: day.date, spent: 0 }
+    else if (!cheapest || day.spent < cheapest.spent) cheapest = { date: day.date, spent: day.spent }
+  }
+
+  let suspicious: MonthlySummary['mostSuspiciousCategory'] = null
+  const previous = calculateCategorySpending(ledger.transactions, addMonthKey(month, -1), categories)
+  if (previous.length && slices.length) {
+    const before = new Map(previous.map((s) => [s.category.id, s.total]))
+    let best: (typeof slices)[number] | null = null
+    let bestJump = 0
+    for (const s of slices) {
+      const jump = fromPaise(toPaise(s.total) - toPaise(before.get(s.category.id) ?? 0))
+      if (jump > bestJump) {
+        best = s
+        bestJump = jump
+      }
+    }
+    if (best) suspicious = { category: best.category, total: best.total, reason: 'jump', detail: bestJump }
+  }
+  if (!suspicious && slices.length > 1) {
+    const rest = slices.slice(1)
+    const frequent = rest.reduce((a, b) => (b.count > a.count ? b : a))
+    suspicious = { category: frequent.category, total: frequent.total, reason: 'frequent', detail: frequent.count }
+  }
+
+  return {
+    month,
+    startedWith: summary.starting,
+    cameIn: summary.received,
+    wentMissing: summary.spent,
+    survived: fromPaise(toPaise(summary.received) - toPaise(summary.spent)),
+    stillGot: summary.current,
+    spendDays: insights.spendDays,
+    calmDays: insights.calmDays,
+    transactionCount: summary.count,
+    mostExpensiveCategory: slices[0] ? { category: slices[0].category, total: slices[0].total } : null,
+    mostExpensiveDay: insights.biggestDay ? { date: insights.biggestDay.date, spent: insights.biggestDay.spent } : null,
+    mostPeacefulDay: peaceful ?? cheapest,
+    mostSuspiciousCategory: suspicious,
+  }
+}
+
+function addMonthKey(month: MonthKey, delta: number): MonthKey {
+  const [y, m] = month.split('-').map(Number)
+  const d = new Date(y, m - 1 + delta, 1)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+}

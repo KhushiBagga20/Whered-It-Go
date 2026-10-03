@@ -48,6 +48,7 @@ function DayBody({ date }: { date: DateKey }) {
     txns.filter((t) => t.date === date),
     monthOf(date),
   ).get(date)!
+  const owner = useData((s) => s.viewer?.role !== 'observer')
   const future = date > today
   const expenseCount = activity.transactions.filter((t) => t.type === 'expense').length
 
@@ -135,16 +136,18 @@ function DayBody({ date }: { date: DateKey }) {
             View transactions
           </Button>
         )}
-        <Button
-          variant="primary"
-          onClick={() => {
-            ui.showDay(null)
-            ui.openComposer({ date })
-          }}
-          icon={<Plus size={18} strokeWidth={3} />}
-        >
-          Add for this day
-        </Button>
+        {owner && (
+          <Button
+            variant="primary"
+            onClick={() => {
+              ui.showDay(null)
+              ui.openComposer({ date })
+            }}
+            icon={<Plus size={18} strokeWidth={3} />}
+          >
+            Add for this day
+          </Button>
+        )}
       </div>
     </div>
   )

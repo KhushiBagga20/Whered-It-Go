@@ -7,19 +7,30 @@ import { MoneyDisplay } from './ui/MoneyDisplay'
 import styles from './AccountCard.module.css'
 
 /** A place money sits, drawn like a little sticker, with its share of the total. */
-export function AccountCard({ position, onClick, index }: { position: AccountPosition; onClick: () => void; index: number }) {
+export function AccountCard({
+  position,
+  onClick,
+  index,
+}: {
+  position: AccountPosition
+  /** Omit for a read-only card (Khushi can look, not touch). */
+  onClick?: () => void
+  index: number
+}) {
   const { account, balance, monthIn, monthOut, share } = position
-    const negative = balance < 0
+  const negative = balance < 0
   return (
     <m.button
       type="button"
       className={styles.card}
       onClick={onClick}
+      disabled={!onClick}
+      data-readonly={!onClick || undefined}
       style={{ ['--acc' as string]: `var(--cat-${account.color})` }}
       initial={{ opacity: 0, y: 20, rotate: index % 2 ? 4 : -4 }}
       animate={{ opacity: 1, y: 0, rotate: index % 2 ? 0.8 : -0.8 }}
-      whileHover={{ rotate: 0, y: -3 }}
-      whileTap={{ scale: 0.97 }}
+      whileHover={onClick ? { rotate: 0, y: -3 } : undefined}
+      whileTap={onClick ? { scale: 0.97 } : undefined}
       transition={{ type: 'spring', stiffness: 380, damping: 26, delay: index * 0.05 }}
       aria-label={`${account.name}: ${formatINR(balance)}${account.archived ? ' (archived)' : ''}`}
       data-archived={account.archived || undefined}

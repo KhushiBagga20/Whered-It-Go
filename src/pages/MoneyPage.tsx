@@ -22,6 +22,7 @@ import {
   useMonthTransactions,
   useToday,
 } from '../state/selectors'
+import { useData } from '../state/store'
 import styles from './MoneyPage.module.css'
 
 export default function MoneyPage() {
@@ -35,6 +36,7 @@ export default function MoneyPage() {
   const [editing, setEditing] = useState<Account | undefined>()
   const [editorOpen, setEditorOpen] = useState(false)
   const [adjusting, setAdjusting] = useState(false)
+  const owner = useData((s) => s.viewer?.role !== 'observer')
 
   const active = positions.filter((p) => !p.account.archived).sort((a, b) => a.account.sortOrder - b.account.sortOrder)
   const archived = positions.filter((p) => p.account.archived)
@@ -80,23 +82,34 @@ export default function MoneyPage() {
         </div>
       )}
 
+      {active.length === 0 && (
+        <EmptyState
+          title="Where are we keeping the money?"
+          line={owner ? 'Add a bank, UPI or cash pocket below.' : 'Jais hasn’t added any accounts yet.'}
+          expression="suspicious"
+          size={64}
+        />
+      )}
+
       <div className={styles.cards}>
         {active.map((p, i) => (
-          <AccountCard key={p.account.id} position={p} index={i} onClick={() => openEditor(p.account)} />
+          <AccountCard key={p.account.id} position={p} index={i} onClick={owner ? () => openEditor(p.account) : undefined} />
         ))}
-        <button type="button" className={styles.add} onClick={() => openEditor()}>
-          <Plus size={22} strokeWidth={3} /> Add a place
-        </button>
+        {owner && (
+          <button type="button" className={styles.add} onClick={() => openEditor()}>
+            <Plus size={22} strokeWidth={3} /> Add a place
+          </button>
+        )}
       </div>
 
-      <button type="button" className={styles.start} onClick={() => setAdjusting(true)}>
+      <button type="button" className={styles.start} onClick={() => setAdjusting(true)} disabled={!owner}>
         <span>
           {monthName(month)} started with <strong className="num">{formatINR(summary.starting)}</strong>
           {summary.adjustment !== 0 && (
             <span className={styles.adj}> (adjusted {formatINR(summary.adjustment, { sign: 'always' })})</span>
           )}
         </span>
-        <span className={styles.startCta}>Adjust</span>
+        {owner && <span className={styles.startCta}>Adjust</span>}
       </button>
 
       <section aria-labelledby="money-in">
@@ -123,7 +136,7 @@ export default function MoneyPage() {
           </summary>
           <div className={styles.cards}>
             {archived.map((p, i) => (
-              <AccountCard key={p.account.id} position={p} index={i} onClick={() => openEditor(p.account)} />
+              <AccountCard key={p.account.id} position={p} index={i} onClick={owner ? () => openEditor(p.account) : undefined} />
             ))}
           </div>
         </details>

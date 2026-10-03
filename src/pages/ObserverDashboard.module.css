@@ -1,0 +1,124 @@
+.head {
+  display: grid;
+  gap: 4px;
+  padding-top: var(--space-2);
+}
+
+.title {
+  font-size: clamp(1.6rem, 6.5vw, 2.3rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  max-width: 18ch;
+}
+
+.figures {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 18px;
+}
+
+.figure {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+/* still got takes the full first row on phones */
+.figure:first-child {
+  grid-column: 1 / -1;
+}
+
+.big {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 9vw, 2.6rem);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 0.95;
+  white-space: nowrap;
+  text-shadow: 0 3px 0 rgba(10, 2, 26, 0.35);
+}
+
+.figure:first-child .big {
+  font-size: var(--text-hero);
+}
+
+.gone {
+  color: var(--spent);
+}
+
+.came {
+  color: var(--received);
+}
+
+@container content (min-width: 600px) {
+  .figures {
+    grid-template-columns: 1.3fr 1fr 1fr;
+    align-items: end;
+  }
+  .figure:first-child {
+    grid-column: auto;
+  }
+}
+
+.verdict {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  padding: 10px 14px 12px;
+  border-radius: 24px;
+  background: rgba(19, 7, 42, 0.45);
+  border: 1.5px solid var(--on-sky-line-strong);
+}
+
+.verdictLine {
+  margin-top: 2px;
+  font-family: var(--font-hand);
+  font-size: 1.7rem;
+  line-height: 1.05;
+  color: var(--petal-300);
+}
+
+.quiet {
+  font-family: var(--font-hand);
+  font-size: 1.3rem;
+  color: var(--sun-300);
+}
+
+.notes {
+  display: grid;
+  gap: 10px;
+}
+
+.note {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  padding: 12px 16px;
+  text-align: left;
+  background: var(--petal-200);
+  color: var(--ink-900);
+  border: 2px solid var(--ink-900);
+  border-radius: 16px 6px 16px 14px;
+  box-shadow: 3px 4px 0 rgba(10, 2, 26, 0.3);
+  rotate: -0.6deg;
+  transition: rotate 0.2s var(--ease-bounce);
+}
+
+.note:hover {
+  rotate: 0deg;
+}
+
+.noteText {
+  font-family: var(--font-hand);
+  font-size: 1.3rem;
+  line-height: 1.1;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.noteOn {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--petal-700);
+}

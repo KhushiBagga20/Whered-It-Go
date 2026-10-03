@@ -6,25 +6,34 @@ function csvCell(value: string | number | null | undefined): string {
   return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
 }
 
+/** Typed-in text: a leading = + - @ would run as a formula in Excel/Sheets. */
+function textCell(value: string | null | undefined): string {
+  const s = value ?? ''
+  return csvCell(/^[=+\-@\t\r]/.test(s) ? `'${s}` : s)
+}
+
 /** Every transaction, newest first, spreadsheet-friendly. Amounts are signed. */
 export function transactionsToCsv(snap: Snapshot): string {
   const cats = new Map(snap.categories.map((c) => [c.id, c.name]))
   const accs = new Map(snap.accounts.map((a) => [a.id, a.name]))
-  const header = ['date', 'time', 'type', 'amount', 'signed_amount', 'category', 'description', 'account', 'note']
+  const notes = new Map<string, string[]>()
+  for (const c of [...snap.comments].sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1))) {
+    notes.set(c.transactionId, [...(notes.get(c.transactionId) ?? []), c.comment])
+  }
+  const header = ['date', 'time', 'type', 'amount', 'signed_amount', 'category', 'description', 'account', 'note', 'khushi_notes']
   const rows = [...snap.transactions].sort(compareTransactionsDesc).map((t) =>
     [
-      t.date,
-      t.time,
-      t.type,
-      t.amount.toFixed(2),
-      (t.type === 'expense' ? -t.amount : t.amount).toFixed(2),
-      cats.get(t.categoryId) ?? '',
-      t.description,
-      accs.get(t.accountId) ?? '',
-      t.note ?? '',
-    ]
-      .map(csvCell)
-      .join(','),
+      csvCell(t.date),
+      csvCell(t.time),
+      csvCell(t.type),
+      csvCell(t.amount.toFixed(2)),
+      csvCell((t.type === 'expense' ? -t.amount : t.amount).toFixed(2)),
+      textCell(cats.get(t.categoryId)),
+      textCell(t.description),
+      textCell(accs.get(t.accountId)),
+      textCell(t.note),
+      textCell(notes.get(t.id)?.join(' | ')),
+    ].join(','),
   )
   return [header.join(','), ...rows].join('\r\n')
 }

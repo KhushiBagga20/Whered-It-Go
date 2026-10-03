@@ -32,87 +32,11 @@
   color: var(--spent);
 }
 
-@media (min-width: 560px) {
+@container content (min-width: 520px) {
   .hero {
     grid-template-columns: 1fr 1fr;
     align-items: end;
   }
-}
-
-/* ── equation strip ───────────────────────── */
-.equation {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 4px 6px;
-  padding: 12px 2px;
-  border-top: 2px dashed var(--on-sky-line-strong);
-  border-bottom: 2px dashed var(--on-sky-line-strong);
-}
-
-.term {
-  display: grid;
-  justify-items: start;
-  gap: 1px;
-  min-width: 0;
-  text-align: left;
-}
-
-button.term {
-  margin: -6px -8px;
-  padding: 6px 8px;
-  border-radius: 12px;
-  transition: background 0.15s;
-}
-
-button.term:hover {
-  background: rgba(226, 211, 255, 0.08);
-}
-
-button.term .termLabel {
-  text-decoration: underline dotted var(--on-sky-faint);
-  text-underline-offset: 3px;
-}
-
-.termValue {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 1.05rem;
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-}
-
-.in {
-  color: var(--received);
-}
-
-.out {
-  color: var(--spent);
-}
-
-.termLabel {
-  font-family: var(--font-hand);
-  font-size: 1.02rem;
-  line-height: 1;
-  color: var(--on-sky-muted);
-}
-
-.adjusted {
-  color: var(--sun-400);
-}
-
-.op {
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--on-sky-faint);
-}
-
-.footnote {
-  margin-top: calc(var(--space-5) * -1 + 6px);
-  font-size: var(--text-xs);
-  color: var(--on-sky-faint);
 }
 
 /* ── today ────────────────────────────────── */
@@ -279,9 +203,24 @@ button.term .termLabel {
   margin: 0 -10px;
 }
 
-@media (min-width: 1024px) {
+/* Unfolded Fold, desktop: chart on the left, patterns + evidence on the right */
+@container content (min-width: 680px) {
   .grid {
     grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    column-gap: var(--col-gap);
     align-items: start;
+  }
+}
+
+/* Cover screen: smaller stat numbers so three still fit side by side */
+@container content (max-width: 380px) {
+  .statValue {
+    font-size: 1.1rem;
+  }
+  .stat {
+    padding: 4px 8px;
+  }
+  .todayText {
+    font-size: var(--text-sm);
   }
 }

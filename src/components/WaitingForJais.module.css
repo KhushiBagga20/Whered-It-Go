@@ -1,0 +1,39 @@
+.page {
+  position: relative;
+  z-index: var(--z-content);
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: var(--space-4);
+  min-height: 100dvh;
+  padding: calc(var(--safe-top) + 40px) var(--gutter) 80px;
+  text-align: center;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: var(--space-4);
+}
+
+.title {
+  font-family: var(--font-hand);
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--sun-300);
+}
+
+.line {
+  max-width: 34ch;
+  color: var(--on-sky-soft);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: var(--space-2);
+}

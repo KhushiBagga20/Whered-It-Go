@@ -39,6 +39,8 @@ interface UiState {
   monthDir: 1 | -1
   composer: ComposerState
   detailId: string | null
+  /** History's split view is showing the detail inline (so the sheet stays shut). */
+  inlineDetail: boolean
   day: DateKey | null
   toasts: Toast[]
   reaction: ActiveReaction | null
@@ -50,12 +52,14 @@ interface UiState {
 }
 
 let seq = 1
+let canCreate: (() => boolean) | null = null
 
 export const useUi = create<UiState>(() => ({
   month: currentMonthKey(),
   monthDir: 1,
   composer: { open: false, editId: null, preset: null, seq: 0 },
   detailId: null,
+  inlineDetail: false,
   day: null,
   toasts: [],
   reaction: null,
@@ -71,7 +75,15 @@ export const ui = {
     useUi.setState((s) => ({ month, monthDir: month > prev ? 1 : -1, gust: s.gust + 1 }))
   },
   openComposer(preset: Partial<TransactionDraft> | null = null) {
+    if (canCreate && !canCreate()) {
+      ui.toast('Only Jais can add transactions. You can fix them and leave notes.')
+      return
+    }
     useUi.setState((s) => ({ composer: { open: true, editId: null, preset, seq: s.composer.seq + 1 } }))
+  },
+  /** Wired by the data store so ui.ts doesn't import it (avoids a cycle). */
+  setCreateGuard(fn: () => boolean) {
+    canCreate = fn
   },
   editTransaction(id: string) {
     useUi.setState((s) => ({ composer: { open: true, editId: id, preset: null, seq: s.composer.seq + 1 } }))
@@ -81,6 +93,9 @@ export const ui = {
   },
   showDetail(id: string | null) {
     useUi.setState({ detailId: id })
+  },
+  setInlineDetail(inline: boolean) {
+    useUi.setState({ inlineDetail: inline })
   },
   showDay(day: DateKey | null) {
     useUi.setState({ day })

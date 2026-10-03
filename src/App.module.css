@@ -6,13 +6,14 @@
   overflow-x: clip;
 }
 
-.shell[data-desktop] {
+/* open (unfolded Fold), desktop, wide: navigation moves into a side rail */
+.shell[data-rail] {
   display: grid;
-  grid-template-columns: 248px minmax(0, 1fr);
+  grid-template-columns: var(--rail-w) minmax(0, 1fr);
 }
 
-.shell[data-wide] {
-  grid-template-columns: 248px minmax(0, 1fr) 340px;
+.shell[data-layout='wide'] {
+  grid-template-columns: var(--rail-w) minmax(0, 1fr) 340px;
 }
 
 .main {
@@ -28,20 +29,28 @@
   pointer-events: none;
 }
 
-.shell[data-desktop] .sun {
-  top: 110px;
+.shell[data-layout='cover'] .sun {
+  top: calc(var(--safe-top) + 84px);
+  right: -26px;
+}
+
+.shell[data-rail] .sun {
+  top: 104px;
   right: 24px;
 }
 
+/* The content column is a size container: pages lay themselves out by the
+   room they actually get (rail or not, folded or not), not by the screen. */
 .content {
   position: relative;
+  container: content / inline-size;
   max-width: var(--content-max);
   margin: 0 auto;
   padding: 0 var(--gutter) calc(var(--hill-h) + 72px);
   outline: none;
 }
 
-.shell[data-desktop] .content {
+.shell[data-rail] .content {
   padding-bottom: calc(var(--hill-h) + 56px);
 }
 
@@ -57,7 +66,7 @@
   pointer-events: auto;
 }
 
-.shell[data-desktop] .stage {
+.shell[data-rail] .stage {
   left: auto;
   right: 7%;
 }

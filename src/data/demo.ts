@@ -6,8 +6,11 @@
  *   September   8,000 start  +2,000 in  −2,430 out  → 7,570
  */
 import { buildDefaultCategories, buildDefaultProfile, DEFAULT_PREFS } from './defaults'
+import { LOCAL_MEMBERS, LOCAL_OWNER_ID } from './localRepo'
 import { newId } from '../lib/id'
-import type { Account, Snapshot, Transaction, TxType } from './types'
+import type { Account, Snapshot, Transaction, TransactionComment, TxType } from './types'
+
+const KHUSHI_ID = LOCAL_MEMBERS[1].id
 
 type Row = [date: string, time: string, amount: number, category: string, description: string, account: 'bank' | 'upi' | 'cash', note?: string]
 
@@ -95,6 +98,8 @@ export function buildDemoSnapshot(): Snapshot {
       note: note ?? null,
       createdAt: created,
       updatedAt: created,
+      createdBy: LOCAL_OWNER_ID,
+      updatedBy: LOCAL_OWNER_ID,
     }
   }
 
@@ -105,13 +110,37 @@ export function buildDemoSnapshot(): Snapshot {
     ...SEPTEMBER_OUT.map(toTx('expense')),
   ]
 
+  // Khushi has already been through the evidence: a couple of notes and one fix.
+  const find = (description: string, date: string) => transactions.find((t) => t.description === description && t.date === date)!
+  const note = (t: Transaction, comment: string, at: string): TransactionComment => ({
+    id: newId(),
+    transactionId: t.id,
+    authorId: KHUSHI_ID,
+    comment,
+    createdAt: new Date(at).toISOString(),
+  })
+  const myntra = find('Myntra', '2026-09-06')
+  const zomato = find('Zomato', '2026-09-17')
+  const mcd = find('McDonald’s', '2026-09-23')
+  const comments = [
+    note(myntra, 'is this the black tee i said looked good on you. because then it’s allowed.', '2026-09-06T21:10:00+05:30'),
+    note(zomato, 'you could’ve told me you were ordering this 😭', '2026-09-17T22:30:00+05:30'),
+    note(mcd, 'large fries were NOT necessary.', '2026-09-23T21:02:00+05:30'),
+  ]
+  const arcade = find('Arcade', '2026-09-19')
+  arcade.description = 'Arcade (lost to me)'
+  arcade.updatedBy = KHUSHI_ID
+  arcade.updatedAt = new Date('2026-09-19T22:05:00+05:30').toISOString()
+
   return {
     transactions,
     accounts,
     categories,
     monthSettings: [],
+    comments,
+    members: LOCAL_MEMBERS,
     profile: buildDefaultProfile({
-      displayName: '',
+      displayName: 'Jais',
       mascotName: 'Khushi',
       startMonth: '2026-08',
       trackingSince: '2026-08-01',

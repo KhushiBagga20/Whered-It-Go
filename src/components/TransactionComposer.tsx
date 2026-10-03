@@ -97,6 +97,7 @@ function ComposerSheet() {
   const composer = useUi((s) => s.composer)
   const transactions = useData((s) => s.transactions)
   const judginess = useData((s) => s.profile.prefs.judginess)
+  const observer = useData((s) => s.viewer?.role === 'observer')
   const ledger = useLedger()
   const accounts = useActiveAccounts()
   const editing = composer.editId ? transactions.find((t) => t.id === composer.editId) : undefined
@@ -198,7 +199,8 @@ function ComposerSheet() {
       const r = submitRef.current?.getBoundingClientRect()
       if (r) ui.burst(tx.type === 'expense' ? 'spent' : 'received', r.left + r.width / 2, r.top + r.height / 2)
       ui.closeComposer()
-      window.setTimeout(() => react(created ? tx.type : 'edit', tx), 320)
+      const actor = useData.getState().viewer?.role
+      window.setTimeout(() => react(created ? tx.type : 'edit', tx, { actor }), 320)
       const viewing = useUi.getState().month
       if (monthOf(tx.date) !== viewing) {
         ui.toast(`Saved to ${formatDayLong(tx.date)}.`, {
@@ -376,12 +378,14 @@ function ComposerSheet() {
                   {c.name}
                 </button>
               ))}
-              <button type="button" className={`${form.chip} ${styles.newChip}`} onClick={() => setNewCategory(true)}>
-                <span className={form.chipIcon}>
-                  <Plus size={18} strokeWidth={2.6} />
-                </span>
-                New
-              </button>
+              {!observer && (
+                <button type="button" className={`${form.chip} ${styles.newChip}`} onClick={() => setNewCategory(true)}>
+                  <span className={form.chipIcon}>
+                    <Plus size={18} strokeWidth={2.6} />
+                  </span>
+                  New
+                </button>
+              )}
             </div>
             {errors.categoryId && (
               <p className={form.error}>

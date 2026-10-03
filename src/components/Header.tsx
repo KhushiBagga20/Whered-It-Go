@@ -1,25 +1,25 @@
 import { Settings } from 'lucide-react'
 import { Link, useLocation } from 'wouter'
-import { useIsDesktop } from '../hooks/useMedia'
+import { useLayout } from '../hooks/useMedia'
 import { useData } from '../state/store'
 import { LogoMark, Wordmark } from './Brand'
 import styles from './Header.module.css'
 import { MonthNavigator } from './MonthNavigator'
 
-/** Phone: brand row that scrolls away + a sticky month bar. Desktop: just the month bar. */
+/** Phones: brand row that scrolls away + a sticky month bar. With a side rail: just the month bar. */
 export function Header() {
-  const desktop = useIsDesktop()
+  const { rail, mode } = useLayout()
   const [path] = useLocation()
   const demo = useData((s) => s.demo)
   const pending = useData((s) => s.pending)
   const showMonth = !path.startsWith('/settings') && !path.startsWith('/mascot')
   return (
     <>
-      {!desktop && (
+      {!rail && (
         <header className={styles.top}>
           <Link href="/" className={styles.brand} aria-label="Where’dItGo home">
             <LogoMark size={34} />
-            <Wordmark />
+            <Wordmark tagline={mode !== 'cover'} />
           </Link>
           <div className={styles.right}>
             {demo && (

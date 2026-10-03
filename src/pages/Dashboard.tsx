@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { Link } from 'wouter'
 import { monthSwap, rise, stagger } from '../animations/variants'
 import { EmptyState } from '../components/EmptyState'
+import { MoneyEquation } from '../components/MoneyEquation'
+import { MonthRecap } from '../components/MonthRecap'
 import { MonthStartSheet } from '../components/MonthStartSheet'
 import { SpendingChart } from '../components/SpendingChart'
 import { TransactionRow } from '../components/TransactionRow'
@@ -22,6 +24,7 @@ import {
   useMonthTransactions,
   useToday,
 } from '../state/selectors'
+import { useData } from '../state/store'
 import { ui, useUi } from '../state/ui'
 import styles from './Dashboard.module.css'
 
@@ -47,6 +50,7 @@ function DashboardMonth({ month }: { month: string }) {
   const categories = useCategoryMap()
   const accounts = useAccountMap()
   const [adjusting, setAdjusting] = useState(false)
+  const owner = useData((s) => s.viewer?.role !== 'observer')
   const isCurrent = today.slice(0, 7) === month
   const todayActivity = isCurrent ? days.get(today) : undefined
   const recent = [...txns].sort(compareTransactionsDesc).slice(0, 4)
@@ -66,40 +70,11 @@ function DashboardMonth({ month }: { month: string }) {
       </m.section>
 
       {/* ── How we got there: start + in − out = now ── */}
-      <m.section className={styles.equation} variants={rise} aria-label="How the balance adds up">
-        <button type="button" className={styles.term} onClick={() => setAdjusting(true)}>
-          <span className={`${styles.termValue} num`}>{formatINR(summary.starting)}</span>
-          <span className={styles.termLabel}>
-            started with{summary.adjustment !== 0 && <span className={styles.adjusted}>*</span>}
-          </span>
-        </button>
-        <span className={styles.op} aria-label="plus">
-          +
-        </span>
-        <div className={styles.term}>
-          <span className={`${styles.termValue} ${styles.in} num`}>{formatINR(summary.received)}</span>
-          <span className={styles.termLabel}>received</span>
-        </div>
-        <span className={styles.op} aria-label="minus">
-          −
-        </span>
-        <div className={styles.term}>
-          <span className={`${styles.termValue} ${styles.out} num`}>{formatINR(summary.spent)}</span>
-          <span className={styles.termLabel}>spent</span>
-        </div>
-        <span className={styles.op} aria-label="equals">
-          =
-        </span>
-        <div className={styles.term}>
-          <span className={`${styles.termValue} num`}>{formatINR(summary.current)}</span>
-          <span className={styles.termLabel}>still got</span>
-        </div>
-      </m.section>
-      {summary.adjustment !== 0 && (
-        <p className={styles.footnote}>
-          * includes a {formatINR(summary.adjustment, { sign: 'always' })} starting adjustment
-        </p>
-      )}
+      <m.div variants={rise}>
+        <MoneyEquation summary={summary} onAdjust={owner ? () => setAdjusting(true) : undefined} />
+      </m.div>
+
+      {!isCurrent && <MonthRecap month={month} />}
 
       {isCurrent && (
         <m.button
@@ -189,6 +164,8 @@ function DashboardMonth({ month }: { month: string }) {
           </m.section>
         </div>
       </div>
+
+      {isCurrent && <MonthRecap month={month} />}
 
       <MonthStartSheet month={month} open={adjusting} onClose={() => setAdjusting(false)} />
     </m.div>

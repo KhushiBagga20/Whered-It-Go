@@ -64,7 +64,16 @@ function foldSlices(slices: CategorySlice[]): CategorySlice[] {
  * changes); the legend underneath is sorted by amount and doubles as the
  * accessible table. Tap either to drill into a category.
  */
-export function SpendingChart({ slices, total }: { slices: CategorySlice[]; total: number }) {
+export function SpendingChart({
+  slices,
+  total,
+  showMascot = true,
+}: {
+  slices: CategorySlice[]
+  total: number
+  /** Off when the page already has her somewhere better. */
+  showMascot?: boolean
+}) {
   const [selected, setSelected] = useState<string | null>(null)
   const [hovered, setHovered] = useState<string | null>(null)
   const reduced = useReducedMotion()
@@ -90,9 +99,11 @@ export function SpendingChart({ slices, total }: { slices: CategorySlice[]; tota
   return (
     <div className={styles.wrap}>
       <div className={styles.chartBox}>
-        <div className={styles.mascot}>
-          <MascotSpot pose="sit" expression={selected ? 'suspicious' : 'judging'} size={54} look={-1} bubble="left" />
-        </div>
+        {showMascot && (
+          <div className={styles.mascot}>
+            <MascotSpot pose="sit" expression={selected ? 'suspicious' : 'judging'} size={54} look={-1} bubble="left" />
+          </div>
+        )}
         <svg
           viewBox={`0 0 ${SIZE} ${SIZE}`}
           className={styles.svg}

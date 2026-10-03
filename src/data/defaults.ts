@@ -95,14 +95,6 @@ export const DEFAULT_PREFS: Prefs = {
   reactions: true,
   judginess: 'normal',
   weekStartsOn: 1,
-  notifications: {
-    enabled: false,
-    eveningNudge: true,
-    nudgeTime: '21:00',
-    bigDayAlert: true,
-    bigDayThreshold: 1500,
-    celebrateSaving: true,
-  },
 }
 
 export function buildDefaultProfile(overrides: Partial<Profile> = {}): Profile {
@@ -117,11 +109,9 @@ export function buildDefaultProfile(overrides: Partial<Profile> = {}): Profile {
   }
 }
 
-/** Deep-merge stored prefs over defaults so new settings get sane values. */
+/** Merge stored prefs over defaults so new settings get sane values (and retired ones drop out). */
 export function withPrefDefaults(prefs: Partial<Prefs> | undefined): Prefs {
-  return {
-    ...DEFAULT_PREFS,
-    ...prefs,
-    notifications: { ...DEFAULT_PREFS.notifications, ...prefs?.notifications },
-  }
+  const merged = { ...DEFAULT_PREFS, ...prefs } as Prefs & { notifications?: unknown }
+  delete merged.notifications
+  return merged
 }

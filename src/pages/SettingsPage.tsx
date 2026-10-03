@@ -1,4 +1,4 @@
-import { BellRing, ChevronRight, Download, FileJson, LogOut, Plus, RotateCcw, Sparkles, Trash2, Wallet } from 'lucide-react'
+import { ChevronRight, Download, FileJson, KeyRound, LogOut, Plus, RotateCcw, Sparkles, Trash2, Wallet } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { Link } from 'wouter'
 import { LogoMark, Wordmark } from '../components/Brand'
@@ -8,11 +8,10 @@ import { CategoryBadge } from '../components/ui/CategoryBadge'
 import form from '../components/ui/Form.module.css'
 import { Segmented } from '../components/ui/Segmented'
 import { Switch } from '../components/ui/Switch'
-import type { Category, Judginess, MotionLevel, NotificationPrefs, TxType } from '../data/types'
-import { downloadText, snapshotToJson, transactionsToCsv } from '../lib/export'
+import type { Category, Judginess, MotionLevel, TxType } from '../data/types'
+import { changePin } from '../lib/auth'
 import { todayKey } from '../lib/dates'
-import { deliver, permissionState, requestPermission, testNudge, type PermissionState } from '../lib/notifications'
-import { isCloudConfigured } from '../lib/supabase'
+import { downloadText, snapshotToJson, transactionsToCsv } from '../lib/export'
 import { react } from '../mascot/react'
 import { useCategories } from '../state/selectors'
 import { resetLocal, signOut, updatePrefs, updateProfile, useData } from '../state/store'
@@ -29,7 +28,19 @@ function Panel({ title, note, children }: { title: string; note?: string; childr
   )
 }
 
-function ToggleRow({ title, line, checked, onChange, disabled }: { title: string; line?: string; checked: boolean; onChange: (v: boolean) => void; disabled?: boolean }) {
+function ToggleRow({
+  title,
+  line,
+  checked,
+  onChange,
+  disabled,
+}: {
+  title: string
+  line?: string
+  checked: boolean
+  onChange: (v: boolean) => void
+  disabled?: boolean
+}) {
   return (
     <div className={form.toggleRow}>
       <span className={form.toggleText}>
@@ -47,12 +58,13 @@ export default function SettingsPage() {
   const mode = useData((s) => s.mode)
   const email = useData((s) => s.email)
   const demo = useData((s) => s.demo)
+  const viewer = useData((s) => s.viewer)
+  const owner = viewer?.role === 'owner'
   const expenseCats = useCategories('expense')
   const incomeCats = useCategories('income')
   const [name, setName] = useState(profile.displayName)
   const [mascotName, setMascotName] = useState(profile.mascotName)
   const [editor, setEditor] = useState<{ kind: TxType; category?: Category } | null>(null)
-  const [permission, setPermission] = useState<PermissionState>(permissionState())
   const [confirmReset, setConfirmReset] = useState(false)
 
   const saveNames = () => {
@@ -62,23 +74,17 @@ export default function SettingsPage() {
     if (Object.keys(patch).length) void updateProfile(patch)
   }
 
-  const setNotif = (patch: Partial<NotificationPrefs>) => void updatePrefs({ notifications: { ...prefs.notifications, ...patch } })
-
-  const enableNotifications = async (on: boolean) => {
-    if (!on) {
-      setNotif({ enabled: false })
-      return
-    }
-    const result = await requestPermission()
-    setPermission(result)
-    if (result === 'granted') setNotif({ enabled: true })
-    else if (result === 'denied') ui.toast('Notifications are blocked for this site. Allow them in your browser’s site settings.', { tone: 'error' })
-    else if (result === 'unsupported') ui.toast('This browser can’t show notifications.', { tone: 'error' })
-  }
-
   const exportData = (kind: 'csv' | 'json') => {
     const s = useData.getState()
-    const snap = { transactions: s.transactions, accounts: s.accounts, categories: s.categories, monthSettings: s.monthSettings, profile: s.profile }
+    const snap = {
+      transactions: s.transactions,
+      accounts: s.accounts,
+      categories: s.categories,
+      monthSettings: s.monthSettings,
+      profile: s.profile,
+      comments: s.comments,
+      members: s.members,
+    }
     const stamp = todayKey()
     if (kind === 'csv') downloadText(`whereditgo-${stamp}.csv`, transactionsToCsv(snap), 'text/csv')
     else downloadText(`whereditgo-${stamp}.json`, snapshotToJson(snap), 'application/json')
@@ -91,143 +97,166 @@ export default function SettingsPage() {
         <h1 className={styles.title}>The fine print</h1>
       </header>
 
-      <Panel title="You two">
-        <div className={form.field} style={{ marginTop: 0 }}>
-          <label className={form.label} htmlFor="set-name">
-            What should she call you?
-          </label>
-          <input
-            id="set-name"
-            className={form.input}
-            value={name}
-            maxLength={40}
-            placeholder="your name"
-            onChange={(e) => setName(e.target.value)}
-            onBlur={saveNames}
-          />
+      <Panel title={owner ? 'You, the money guy' : 'You, the co-pilot'}>
+        <div className={styles.whoCard} data-person={viewer?.person ?? undefined}>
+          <span className={styles.whoFlower} aria-hidden="true">
+            {viewer?.person === 'khushi' ? '🌸' : '🌻'}
+          </span>
+          <span>
+            <strong>{viewer?.name ?? (owner ? 'Jais' : 'Khushi')}</strong>
+            <span className={styles.whoLine}>
+              {owner
+                ? 'Tracks the money. Adds, edits and deletes everything.'
+                : 'Sees everything, fixes things, leaves notes. Can’t add or delete transactions.'}
+            </span>
+          </span>
         </div>
-        <div className={form.field}>
-          <label className={form.label} htmlFor="set-mascot">
-            Her name
-          </label>
-          <input
-            id="set-mascot"
-            className={form.input}
-            value={mascotName}
-            maxLength={24}
-            onChange={(e) => setMascotName(e.target.value)}
-            onBlur={saveNames}
-          />
+        <p className={styles.line}>
+          {mode === 'cloud' ? (
+            <>
+              Signed in{email ? <> as <strong>{email}</strong></> : null}. Synced through Supabase and private to the two of you —
+              the database itself enforces who can do what.
+            </>
+          ) : (
+            <>
+              {demo ? <strong>You’re looking at demo data</strong> : 'Your data lives on this device only'} — on-device mode, no
+              real PINs. Add Supabase keys for the real thing (see DEPLOYMENT.md).
+            </>
+          )}
+        </p>
+        {mode === 'cloud' && <ChangePin />}
+        <div className={styles.buttons}>
+          <Button variant="secondary" icon={<LogOut size={18} />} onClick={() => void signOut()}>
+            {mode === 'cloud' ? 'Log out' : 'Switch person'}
+          </Button>
         </div>
       </Panel>
 
-      <Panel title="Where the data lives">
-        {mode === 'cloud' ? (
-          <>
-            <p className={styles.line}>
-              Signed in as <strong>{email}</strong>. Your data is private to this account (Supabase, row-level security).
-            </p>
-            <Button variant="secondary" icon={<LogOut size={18} />} onClick={() => void signOut()}>
-              Sign out
-            </Button>
-          </>
-        ) : (
-          <>
-            <p className={styles.line}>
-              {demo ? (
-                <>
-                  <strong>You’re looking at demo data</strong> (August–September 2026). Nothing here is real.
-                </>
-              ) : (
-                <>Your data lives on this device only.</>
-              )}{' '}
-              {!isCloudConfigured && 'Add Supabase keys to sync across devices (see README).'}
-            </p>
-            <div className={styles.buttons}>
-              {demo ? (
+      {owner && (
+        <Panel title="You two">
+          <div className={form.field} style={{ marginTop: 0 }}>
+            <label className={form.label} htmlFor="set-name">
+              What should she call you?
+            </label>
+            <input
+              id="set-name"
+              className={form.input}
+              value={name}
+              maxLength={40}
+              placeholder="your name"
+              onChange={(e) => setName(e.target.value)}
+              onBlur={saveNames}
+            />
+          </div>
+          <div className={form.field}>
+            <label className={form.label} htmlFor="set-mascot">
+              Her name
+            </label>
+            <input
+              id="set-mascot"
+              className={form.input}
+              value={mascotName}
+              maxLength={24}
+              onChange={(e) => setMascotName(e.target.value)}
+              onBlur={saveNames}
+            />
+          </div>
+        </Panel>
+      )}
+
+      {mode === 'local' && (
+        <Panel title="This device">
+          <div className={styles.buttons}>
+            {demo ? (
+              <Button
+                variant={confirmReset ? 'danger' : 'primary'}
+                icon={<Sparkles size={18} />}
+                onClick={() => (confirmReset ? void resetLocal('fresh') : setConfirmReset(true))}
+              >
+                {confirmReset ? 'Yes, clear the demo' : 'Start for real'}
+              </Button>
+            ) : (
+              <>
                 <Button
-                  variant={confirmReset ? 'danger' : 'primary'}
-                  icon={<Sparkles size={18} />}
+                  variant={confirmReset ? 'danger' : 'secondary'}
+                  icon={<Trash2 size={18} />}
                   onClick={() => (confirmReset ? void resetLocal('fresh') : setConfirmReset(true))}
                 >
-                  {confirmReset ? 'Yes, clear the demo' : 'Start for real'}
+                  {confirmReset ? 'Tap again: erase everything' : 'Erase & start over'}
                 </Button>
-              ) : (
-                <>
-                  <Button
-                    variant={confirmReset ? 'danger' : 'secondary'}
-                    icon={<Trash2 size={18} />}
-                    onClick={() => (confirmReset ? void resetLocal('fresh') : setConfirmReset(true))}
-                  >
-                    {confirmReset ? 'Tap again: erase everything' : 'Erase & start over'}
-                  </Button>
-                  <Button variant="ghost" icon={<RotateCcw size={18} />} onClick={() => void resetLocal('demo')}>
-                    Load demo
-                  </Button>
-                </>
-              )}
-            </div>
-            {confirmReset && (
-              <p className={styles.warn} role="alert">
-                This wipes every transaction, account and category on this device. Export first if you want a copy.
-              </p>
+                <Button variant="ghost" icon={<RotateCcw size={18} />} onClick={() => void resetLocal('demo')}>
+                  Load demo
+                </Button>
+              </>
             )}
-          </>
-        )}
-      </Panel>
+          </div>
+          {confirmReset && (
+            <p className={styles.warn} role="alert">
+              This wipes every transaction, account, category and note on this device. Export first if you want a copy.
+            </p>
+          )}
+        </Panel>
+      )}
 
-      <Panel title="Categories" note="Tap one to rename it, change its icon or colour. “Other” is yours to customise too.">
-        <h3 className={styles.subhead}>Spending</h3>
-        <ul className={styles.catList}>
-          {expenseCats.map((c) => (
-            <li key={c.id}>
-              <button type="button" className={styles.catRow} onClick={() => setEditor({ kind: 'expense', category: c })}>
-                <CategoryBadge category={c} size={34} />
-                <span>{c.name}</span>
-                <ChevronRight size={18} className={styles.chev} />
-              </button>
-            </li>
-          ))}
-        </ul>
-        <Button variant="secondary" size="sm" icon={<Plus size={16} strokeWidth={3} />} onClick={() => setEditor({ kind: 'expense' })}>
-          New spending category
-        </Button>
-        <h3 className={styles.subhead}>Money comes from</h3>
-        <ul className={styles.catList}>
-          {incomeCats.map((c) => (
-            <li key={c.id}>
-              <button type="button" className={styles.catRow} onClick={() => setEditor({ kind: 'income', category: c })}>
-                <CategoryBadge category={c} size={34} />
-                <span>{c.name}</span>
-                <ChevronRight size={18} className={styles.chev} />
-              </button>
-            </li>
-          ))}
-        </ul>
-        <Button variant="secondary" size="sm" icon={<Plus size={16} strokeWidth={3} />} onClick={() => setEditor({ kind: 'income' })}>
-          New income source
-        </Button>
-      </Panel>
+      {owner && (
+        <Panel title="Categories" note="Tap one to rename it, change its icon or colour. “Other” is yours to customise too.">
+          <h3 className={styles.subhead}>Spending</h3>
+          <ul className={styles.catList}>
+            {expenseCats.map((c) => (
+              <li key={c.id}>
+                <button type="button" className={styles.catRow} onClick={() => setEditor({ kind: 'expense', category: c })}>
+                  <CategoryBadge category={c} size={34} />
+                  <span>{c.name}</span>
+                  <ChevronRight size={18} className={styles.chev} />
+                </button>
+              </li>
+            ))}
+          </ul>
+          <Button variant="secondary" size="sm" icon={<Plus size={16} strokeWidth={3} />} onClick={() => setEditor({ kind: 'expense' })}>
+            New spending category
+          </Button>
+          <h3 className={styles.subhead}>Money comes from</h3>
+          <ul className={styles.catList}>
+            {incomeCats.map((c) => (
+              <li key={c.id}>
+                <button type="button" className={styles.catRow} onClick={() => setEditor({ kind: 'income', category: c })}>
+                  <CategoryBadge category={c} size={34} />
+                  <span>{c.name}</span>
+                  <ChevronRight size={18} className={styles.chev} />
+                </button>
+              </li>
+            ))}
+          </ul>
+          <Button variant="secondary" size="sm" icon={<Plus size={16} strokeWidth={3} />} onClick={() => setEditor({ kind: 'income' })}>
+            New income source
+          </Button>
+        </Panel>
+      )}
 
-      <Panel title="Accounts">
-        <Link href="/money" className={styles.linkRow}>
-          <Wallet size={20} /> Manage Bank, UPI, Cash & friends <ChevronRight size={18} className={styles.chev} />
-        </Link>
-      </Panel>
+      {owner && (
+        <Panel title="Accounts">
+          <Link href="/money" className={styles.linkRow}>
+            <Wallet size={20} /> Manage Bank, UPI, Cash & friends <ChevronRight size={18} className={styles.chev} />
+          </Link>
+        </Panel>
+      )}
 
       <Panel title={`${profile.mascotName}`} note="The tiny judge. She lives in the meadow.">
-        <ToggleRow title="Show her" line="Hide her if you need to focus." checked={prefs.mascotVisible} onChange={(v) => void updatePrefs({ mascotVisible: v })} />
+        <ToggleRow
+          title="Show her"
+          line="Hide her if you need to focus."
+          checked={prefs.mascotVisible}
+          onChange={(v) => void updatePrefs({ mascotVisible: v })}
+        />
         <ToggleRow
           title="Let her react"
-          line="Comments on what you add."
+          line="Comments on what happens. Never saved anywhere."
           checked={prefs.reactions}
           disabled={!prefs.mascotVisible}
           onChange={(v) => void updatePrefs({ reactions: v })}
         />
         <div className={form.field}>
-          <span className={form.label} id="judginess">
-            How judgy
-          </span>
+          <span className={form.label}>How judgy</span>
           <Segmented<Judginess>
             label="How judgy"
             value={prefs.judginess}
@@ -238,9 +267,7 @@ export default function SettingsPage() {
               { value: 'strict', label: 'Strict', color: 'var(--petal-500)' },
             ]}
           />
-          <p className={form.hint}>
-            Chill doubles her “that’s a lot” thresholds; strict halves them.
-          </p>
+          <p className={form.hint}>Chill doubles her “that’s a lot” thresholds; strict halves them.</p>
         </div>
         <div className={styles.buttons}>
           <Button variant="ghost" size="sm" onClick={() => react('poke')} disabled={!prefs.mascotVisible || !prefs.reactions}>
@@ -264,7 +291,8 @@ export default function SettingsPage() {
           ]}
         />
         <p className={form.hint} style={{ marginTop: 8 }}>
-          Calm stops the swaying background; Still turns off animation almost everywhere. Your phone’s “reduce motion” setting is always respected.
+          Calm stops the swaying background; Still turns off animation almost everywhere. Your phone’s “reduce motion” setting
+          is always respected.
         </p>
         <div className={form.field}>
           <span className={form.label}>Weeks start on</span>
@@ -277,69 +305,6 @@ export default function SettingsPage() {
               { value: '0', label: 'Sunday' },
             ]}
           />
-        </div>
-      </Panel>
-
-      <Panel
-        title="Nudges"
-        note="Nudges show up while Where’dItGo is open or running in the background. Reminders when the app is fully closed need a push server — not set up yet (see README)."
-      >
-        <ToggleRow
-          title="Allow nudges"
-          line={
-            permission === 'denied'
-              ? 'Blocked in browser settings.'
-              : permission === 'unsupported'
-                ? 'Not supported in this browser.'
-                : 'Never spam. Max one of each a day.'
-          }
-          checked={prefs.notifications.enabled && permission === 'granted'}
-          disabled={permission === 'unsupported'}
-          onChange={(v) => void enableNotifications(v)}
-        />
-        <div className={styles.indent} data-disabled={!(prefs.notifications.enabled && permission === 'granted') || undefined}>
-          <ToggleRow
-            title="Evening check-in"
-            line="“yo where ur money go?” if nothing’s logged."
-            checked={prefs.notifications.eveningNudge}
-            onChange={(v) => setNotif({ eveningNudge: v })}
-          />
-          <div className={form.row} style={{ alignItems: 'center' }}>
-            <label className={form.label} htmlFor="nudge-time">
-              After
-            </label>
-            <input
-              id="nudge-time"
-              type="time"
-              className={form.input}
-              value={prefs.notifications.nudgeTime}
-              onChange={(e) => e.target.value && setNotif({ nudgeTime: e.target.value })}
-            />
-          </div>
-          <ToggleRow
-            title="Big-day alert"
-            line={`When a day passes ₹${prefs.notifications.bigDayThreshold.toLocaleString('en-IN')}.`}
-            checked={prefs.notifications.bigDayAlert}
-            onChange={(v) => setNotif({ bigDayAlert: v })}
-          />
-          <ToggleRow
-            title="Celebrate no-spend days"
-            line="“look at you saving money 🫡”"
-            checked={prefs.notifications.celebrateSaving}
-            onChange={(v) => setNotif({ celebrateSaving: v })}
-          />
-          <Button
-            variant="secondary"
-            size="sm"
-            icon={<BellRing size={16} />}
-            disabled={permission !== 'granted'}
-            onClick={async () => {
-              const ok = await deliver(testNudge(), { record: false })
-              if (!ok) ui.toast('Couldn’t show a notification here.', { tone: 'error' })
-            }}
-          >
-            Send a test nudge
-          </Button>
         </div>
       </Panel>
 
@@ -368,5 +333,93 @@ export default function SettingsPage() {
         onClose={() => setEditor(null)}
       />
     </div>
+  )
+}
+
+/** Change your PIN: the database checks the current one (and counts misses). */
+function ChangePin() {
+  const [open, setOpen] = useState(false)
+  const [current, setCurrent] = useState('')
+  const [next, setNext] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const digits = (v: string) => v.replace(/\D/g, '').slice(0, 4)
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError(null)
+    if (!/^\d{4}$/.test(current) || !/^\d{4}$/.test(next)) {
+      setError('Both PINs are exactly 4 digits.')
+      return
+    }
+    setBusy(true)
+    const result = await changePin(current, next).catch((err: unknown) => ({
+      ok: false,
+      message: err instanceof Error ? err.message : String(err),
+    }))
+    setBusy(false)
+    if (result.ok) {
+      ui.toast('PIN changed.', { tone: 'success' })
+      setOpen(false)
+      setCurrent('')
+      setNext('')
+    } else setError(result.message)
+  }
+
+  if (!open) {
+    return (
+      <div className={styles.buttons} style={{ marginBottom: 10 }}>
+        <Button variant="secondary" size="sm" icon={<KeyRound size={16} />} onClick={() => setOpen(true)}>
+          Change PIN
+        </Button>
+      </div>
+    )
+  }
+  return (
+    <form className={styles.pinForm} onSubmit={submit} noValidate>
+      <div className={form.row}>
+        <div>
+          <label className={form.label} htmlFor="pin-current">
+            Current PIN
+          </label>
+          <input
+            id="pin-current"
+            className={form.input}
+            type="password"
+            inputMode="numeric"
+            autoComplete="current-password"
+            value={current}
+            onChange={(e) => setCurrent(digits(e.target.value))}
+          />
+        </div>
+        <div>
+          <label className={form.label} htmlFor="pin-new">
+            New PIN
+          </label>
+          <input
+            id="pin-new"
+            className={form.input}
+            type="password"
+            inputMode="numeric"
+            autoComplete="new-password"
+            value={next}
+            onChange={(e) => setNext(digits(e.target.value))}
+          />
+        </div>
+      </div>
+      {error && (
+        <p className={form.error} role="alert">
+          {error}
+        </p>
+      )}
+      <div className={styles.buttons}>
+        <Button type="submit" size="sm" disabled={busy}>
+          {busy ? 'Saving…' : 'Save new PIN'}
+        </Button>
+        <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>
+          Cancel
+        </Button>
+      </div>
+    </form>
   )
 }

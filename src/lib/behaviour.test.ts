@@ -1,13 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import { buildDefaultAccounts, buildDefaultCategories, DEFAULT_PREFS } from '../data/defaults'
-import type { Transaction } from '../data/types'
+import { buildDefaultAccounts, buildDefaultCategories } from '../data/defaults'
+import { buildDemoSnapshot } from '../data/demo'
 import { expressionForAmount, pickReaction } from '../mascot/engine'
-import { evaluateNudges } from './notifications'
+import { REACTIONS } from '../mascot/reactions'
+import { transactionsToCsv } from './export'
 import { hasErrors, validateName, validateTransaction } from './validation'
 
 describe('mascot reactions', () => {
-  const rule = (amount: number, categoryKey: string | null = 'transport', extra = {}) =>
-    pickReaction('expense', { amount, categoryKey, hour: 14, ...extra })?.ruleId
+  const never = () => 0.99 // chance-gated rules (minimal "👁️👁️", weekend) stay out
+  const always = () => 0
+  const rule = (amount: number, categoryKey: string | null = 'other', extra = {}, rng = never) =>
+    pickReaction('expense', { amount, categoryKey, hour: 14, ...extra }, 'normal', undefined, rng)?.ruleId
 
   it('scales with the amount', () => {
     expect(rule(40)).toBe('expense-small')
@@ -16,29 +19,75 @@ describe('mascot reactions', () => {
     expect(rule(1850)).toBe('expense-huge')
   })
 
-  it('category and pattern rules win where they should', () => {
+  it('has something to say about every main category', () => {
     expect(rule(220, 'shopping')).toBe('expense-shopping')
-    expect(rule(900, 'shopping')).toBe('expense-large')
-    expect(rule(120, 'food', { sameCategoryRecent: 3 })).toBe('expense-repeat-food')
-    expect(rule(250, 'food', { hour: 1 })).toBe('expense-late-food')
+    expect(rule(80, 'transport')).toBe('expense-transport')
+    expect(rule(120, 'food')).toBe('expense-food')
+    expect(rule(280, 'entertainment')).toBe('expense-entertainment')
+    expect(rule(199, 'subscriptions')).toBe('expense-subscriptions')
     expect(rule(350, 'gifts')).toBe('expense-gift')
+    expect(rule(180, 'health')).toBe('expense-health')
+    expect(rule(120, 'college')).toBe('expense-college')
+  })
+
+  it('notices patterns', () => {
+    expect(rule(120, 'food', { sameCategoryRecent: 3 })).toBe('expense-food-repeat')
+    expect(rule(250, 'food', { hour: 1 })).toBe('expense-food-late')
+    expect(rule(160, 'food', { sameMerchantRecent: 3, merchant: 'Zomato' })).toBe('expense-same-merchant')
+    expect(rule(90, 'other', { streakBefore: 4 })).toBe('expense-streak-broken')
+    expect(rule(900, 'other', { shareOfBalance: 0.45 })).toBe('expense-most-of-it')
+    expect(rule(900, 'shopping')).toBe('expense-large') // big beats category quips
+  })
+
+  it('sometimes just stares', () => {
+    expect(rule(320, 'other', {}, always)).toBe('expense-minimal')
+    expect(rule(2400, 'other', {}, always)).toBe('expense-huge') // huge is never minimal
   })
 
   it('judginess moves the thresholds', () => {
-    expect(pickReaction('expense', { amount: 800, categoryKey: 'transport' }, 'chill')?.ruleId).toBe('expense-moderate')
-    expect(pickReaction('expense', { amount: 800, categoryKey: 'transport' }, 'strict')?.ruleId).toBe('expense-huge')
+    const at = (j: 'chill' | 'strict') => pickReaction('expense', { amount: 800, categoryKey: 'other' }, j, undefined, never)?.ruleId
+    expect(at('chill')).toBe('expense-moderate')
+    expect(at('strict')).toBe('expense-huge')
   })
 
-  it('fills in message templates', () => {
-    for (let i = 0; i < 10; i++) {
-      const r = pickReaction('poke', { spentMonth: 2430, topCategory: 'Food', calmDays: 9, noSpendStreak: 0 })
-      expect(r?.message).not.toMatch(/[{}]/)
+  it('knows who is looking and who did it', () => {
+    expect(pickReaction('greet', { viewer: 'observer', hour: 14 }, 'normal', undefined, never)?.ruleId).toBe('greet-khushi')
+    expect(pickReaction('edit', { actor: 'observer' }, 'normal', undefined, never)?.ruleId).toBe('edit-by-khushi')
+    expect(pickReaction('edit', { actor: 'owner' }, 'normal', undefined, never)?.ruleId).toBe('edit')
+  })
+
+  it('wraps up months', () => {
+    const end = (survived: number, receivedMonth: number) =>
+      pickReaction('month-end', { survived, receivedMonth, spentMonth: 100 }, 'normal', undefined, never)?.ruleId
+    expect(end(-430, 2000)).toBe('month-end-negative')
+    expect(end(900, 2000)).toBe('month-end-comfortable')
+    expect(end(100, 2000)).toBe('month-end')
+  })
+
+  it('fills in every template without leftovers', () => {
+    const ctx = {
+      amount: 640, merchant: 'Zomato', spentMonth: 2430, spentToday: 720, receivedMonth: 2000, balance: 7570,
+      topCategory: 'Food', calmDays: 9, noSpendStreak: 4, streakBefore: 3, shareOfBalance: 0.4, daysLeft: 7,
+      month: 'September', name: 'Jais', survived: -430,
+    }
+    for (const r of REACTIONS) {
+      for (let i = 0; i < r.messages.length + 2; i++) {
+        const picked = pickReaction(r.trigger, ctx, 'normal', [r], () => (i % 10) / 10)
+        if (picked) expect(picked.message, r.id).not.toMatch(/[{}]/)
+      }
     }
   })
 
-  it('income is celebrated', () => {
-    expect(pickReaction('income', { amount: 2000 })?.ruleId).toBe('income')
-    expect(pickReaction('income', { amount: 9000 })?.ruleId).toBe('income-big')
+  it('maps every mood to a drawable face', () => {
+    const faces = ['neutral', 'happy', 'judging', 'shocked', 'suspicious', 'proud', 'sleepy', 'love']
+    for (const r of REACTIONS) {
+      const p = pickReaction(r.trigger, { amount: 1 }, 'normal', [{ ...r, when: undefined, chance: undefined }], never)
+      expect(faces, r.id).toContain(p?.expression)
+    }
+  })
+
+  it('has a properly big library', () => {
+    expect(REACTIONS.reduce((n, r) => n + r.messages.length, 0)).toBeGreaterThan(200)
   })
 
   it('live face while typing', () => {
@@ -93,41 +142,20 @@ describe('validation', () => {
   })
 })
 
-describe('nudges', () => {
-  const prefs = { ...DEFAULT_PREFS.notifications, enabled: true }
-  const tx = (date: string, type: 'expense' | 'income', amount: number): Transaction => ({
-    id: Math.random().toString(),
-    type,
-    amount,
-    categoryId: 'c',
-    accountId: 'a',
-    description: '',
-    date,
-    time: '12:00',
-    note: null,
-    createdAt: `${date}T06:30:00.000Z`,
-    updatedAt: `${date}T06:30:00.000Z`,
-  })
-  const evening = new Date(2026, 8, 23, 21, 30)
-  const morning = new Date(2026, 8, 23, 9, 0)
-
-  it('does nothing when off', () => {
-    expect(evaluateNudges([], { ...prefs, enabled: false }, evening, {})).toBeNull()
-  })
-
-  it('asks in the evening when nothing is logged', () => {
-    expect(evaluateNudges([], prefs, evening, {})?.kind).toBe('evening')
-    expect(evaluateNudges([], prefs, morning, {})).toBeNull()
-    expect(evaluateNudges([], prefs, evening, { evening: '2026-09-23' })).toBeNull()
-  })
-
-  it('flags a big day once', () => {
-    const txns = [tx('2026-09-23', 'expense', 1200), tx('2026-09-23', 'expense', 640)]
-    expect(evaluateNudges(txns, prefs, morning, {})?.kind).toBe('big-day')
-    expect(evaluateNudges(txns, prefs, morning, { 'big-day': '2026-09-23' })).toBeNull()
-  })
-
-  it('celebrates a logged day with no spending', () => {
-    expect(evaluateNudges([tx('2026-09-23', 'income', 500)], prefs, evening, {})?.kind).toBe('saving')
+describe('CSV export', () => {
+  it('includes Khushi’s notes and defuses spreadsheet formulas', () => {
+    const snap = buildDemoSnapshot()
+    const note = snap.comments.find((c) => c.comment.startsWith('large fries'))!
+    const mcd = snap.transactions.find((t) => t.id === note.transactionId)!
+    snap.transactions = snap.transactions.map((t) => (t.id === mcd.id ? { ...t, description: '=HYPERLINK("x")' } : t))
+    const csv = transactionsToCsv(snap)
+    const [header, ...rows] = csv.split('\r\n')
+    expect(header.endsWith(',note,khushi_notes')).toBe(true)
+    expect(rows).toHaveLength(snap.transactions.length)
+    const row = rows.find((r) => r.includes('HYPERLINK'))!
+    expect(row).toContain(`"'=HYPERLINK(""x"")"`)
+    expect(row).toContain('large fries were NOT necessary.')
+    // negative amounts are numbers, not text — left alone
+    expect(row).toMatch(/,-320\.00,/)
   })
 })

@@ -95,3 +95,67 @@
 .sync[data-pending]::before {
   background: var(--sun-400);
 }
+
+.who {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(226, 211, 255, 0.1);
+  color: var(--on-sky-soft);
+  font-weight: 800;
+}
+
+/* ── compact rail: the unfolded Fold ─────────────────────────── */
+.rail[data-compact] {
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) 8px var(--space-3);
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.rail[data-compact] .brand {
+  padding: 0;
+}
+
+.addRound {
+  display: grid;
+  place-items: center;
+  margin: 4px 0 6px;
+}
+
+.addRound > * {
+  width: 60px;
+  height: 60px;
+}
+
+.rail[data-compact] .nav {
+  width: 100%;
+  gap: 2px;
+}
+
+.rail[data-compact] .item {
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-height: 60px;
+  padding: 6px 4px;
+  border-radius: 20px;
+}
+
+.rail[data-compact] .label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.rail[data-compact] .blob {
+  border-radius: 20px;
+}
+
+.rail[data-compact] .status {
+  flex-direction: column;
+  align-items: center;
+}

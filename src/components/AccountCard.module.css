@@ -108,3 +108,11 @@
 .out {
   color: var(--spent-ink);
 }
+
+.card[data-readonly] {
+  cursor: default;
+}
+
+.card:disabled {
+  opacity: 1;
+}

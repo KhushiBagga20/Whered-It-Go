@@ -36,3 +36,12 @@
 .pill:hover {
   background: var(--action-hover);
 }
+
+/* Khushi's eye button: same shape, her colour */
+.judge {
+  background: var(--petal-400);
+}
+
+.judge:hover {
+  background: var(--petal-300);
+}

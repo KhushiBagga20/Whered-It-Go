@@ -76,7 +76,7 @@
   margin: 0 auto;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 700px) {
   .monthBar {
     padding-top: calc(var(--safe-top) + 18px);
     padding-bottom: 18px;
@@ -90,5 +90,12 @@
   }
   to {
     opacity: 1;
+  }
+}
+
+/* cover screen: keep the brand row to one tight line */
+@media (max-width: 419px) {
+  .top {
+    gap: 8px;
   }
 }

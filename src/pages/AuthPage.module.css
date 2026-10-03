@@ -4,31 +4,203 @@
   display: grid;
   justify-items: center;
   align-content: start;
-  gap: var(--space-5);
+  gap: var(--space-4);
   min-height: 100dvh;
-  padding: calc(var(--safe-top) + 40px) var(--gutter) 60px;
+  padding: calc(var(--safe-top) + 28px) var(--gutter) calc(var(--hill-h) + 40px);
 }
 
 .brand {
   display: grid;
   justify-items: center;
-  gap: 10px;
+  gap: 8px;
   text-align: center;
 }
 
 .mascot {
   display: grid;
   justify-items: center;
-  gap: 6px;
+  gap: 4px;
+  min-height: 132px;
 }
 
-.hi {
+.line {
   font-family: var(--font-hand);
-  font-size: 1.45rem;
+  font-size: 1.5rem;
+  line-height: 1;
   color: var(--sun-300);
   text-align: center;
 }
 
+/* ── who are you? ───────────────────────── */
+.who {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.question {
+  font-size: clamp(1.8rem, 8vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  width: min(100%, 420px);
+}
+
+.choice {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: 14px 10px 16px;
+  background: var(--paper);
+  color: var(--on-paper);
+  border: 3px solid var(--ink-900);
+  border-radius: 28px 24px 30px 22px;
+  box-shadow: 5px 6px 0 rgba(10, 2, 26, 0.45);
+}
+
+.choice[data-person='khushi'] {
+  background: var(--petal-200);
+}
+
+.choice[data-person='jais'] {
+  background: var(--sun-200);
+}
+
+.flower {
+  display: grid;
+  place-items: end center;
+  height: 92px;
+}
+
+.name {
+  margin-top: 4px;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.roleHint {
+  font-family: var(--font-hand);
+  font-size: 1.1rem;
+  color: var(--on-paper-muted);
+}
+
+/* ── PIN ─────────────────────────────────── */
+.pinBox {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  width: min(100%, 340px);
+}
+
+.pinHead {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+}
+
+.notYou {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 40px;
+  padding: 0 10px;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--on-sky-muted);
+}
+
+.pinTitle {
+  font-size: 1.9rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+
+.dots {
+  display: flex;
+  gap: 18px;
+  padding: 10px 0 4px;
+}
+
+.dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 3px solid var(--on-sky);
+  background: transparent;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.dot[data-filled] {
+  background: var(--petal-400);
+  border-color: var(--petal-400);
+  box-shadow: 0 0 14px rgba(255, 158, 199, 0.6);
+}
+
+.message {
+  min-height: 1.4em;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--on-sky-muted);
+  text-align: center;
+}
+
+.message[data-tone='error'] {
+  color: var(--petal-300);
+}
+
+.pad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+.key {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1.35;
+  min-height: 56px;
+  border-radius: 22px;
+  background: rgba(19, 7, 42, 0.55);
+  border: 2px solid var(--on-sky-line-strong);
+  color: var(--on-sky);
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  font-weight: 700;
+  transition: background 0.12s, border-color 0.12s;
+  touch-action: manipulation;
+}
+
+.key:hover:not(:disabled) {
+  background: rgba(19, 7, 42, 0.75);
+  border-color: var(--sun-300);
+}
+
+.key:active:not(:disabled) {
+  background: var(--petal-400);
+  color: var(--ink-900);
+}
+
+.key[data-kind='back'] {
+  background: transparent;
+  border-color: transparent;
+}
+
+.key:disabled {
+  opacity: 0.4;
+}
+
+/* ── email fallback ──────────────────────── */
 .card {
   width: min(100%, 400px);
   padding: 20px;
@@ -37,6 +209,11 @@
   border: 3px solid var(--ink-900);
   border-radius: 28px;
   box-shadow: 6px 8px 0 rgba(10, 2, 26, 0.45);
+}
+
+.cardNote {
+  font-size: var(--text-sm);
+  color: var(--on-paper-muted);
 }
 
 .error {
@@ -50,24 +227,45 @@
   font-family: ui-monospace, Menlo, monospace;
 }
 
-.magic {
-  display: block;
+.emailLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   width: 100%;
   min-height: 44px;
-  margin-top: 8px;
+  margin-top: 6px;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--on-sky-faint);
+}
+
+.card .emailLink {
   color: var(--sky-600);
-  font-weight: 800;
 }
 
-.sent {
-  display: grid;
-  justify-items: center;
-  gap: 10px;
-  text-align: center;
-  color: var(--sky-700);
+/* Fold cover screen and other narrow phones */
+@media (max-width: 419px) {
+  .mascot {
+    min-height: 112px;
+  }
+  .choices {
+    gap: 10px;
+  }
+  .flower {
+    height: 76px;
+  }
+  .pad {
+    gap: 10px;
+  }
 }
 
-.sent p {
-  color: var(--on-paper);
-  font-weight: 600;
+/* Short landscape screens: drop the mascot to keep the pad on screen */
+@media (max-height: 560px) and (min-width: 600px) {
+  .page {
+    padding-top: 12px;
+  }
+  .mascot {
+    display: none;
+  }
 }

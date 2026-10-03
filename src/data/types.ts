@@ -7,6 +7,18 @@ export type TimeKey = string
 
 export type TxType = 'expense' | 'income'
 
+/** The two people who use the app. */
+export type Person = 'jais' | 'khushi'
+/** Jais owns the ledger; Khushi observes it (and occasionally interferes). */
+export type Role = 'owner' | 'observer'
+
+export interface Member {
+  id: string
+  person: Person | null
+  name: string
+  role: Role
+}
+
 export interface Transaction {
   id: string
   type: TxType
@@ -20,6 +32,36 @@ export interface Transaction {
   note: string | null
   createdAt: string
   updatedAt: string
+  /** Who added it / last changed it (set by the database, not the client). */
+  createdBy: string | null
+  updatedBy: string | null
+}
+
+/** A permanent note Khushi pinned to a transaction. */
+export interface TransactionComment {
+  id: string
+  transactionId: string
+  authorId: string
+  comment: string
+  createdAt: string
+}
+
+export type ActivityAction =
+  | 'transaction_created'
+  | 'transaction_updated'
+  | 'transaction_deleted'
+  | 'comment_added'
+  | 'account_created'
+  | 'category_created'
+
+export interface ActivityEntry {
+  id: string
+  actorId: string | null
+  action: ActivityAction
+  entityType: 'transaction' | 'comment' | 'account' | 'category'
+  entityId: string
+  metadata: Record<string, unknown>
+  createdAt: string
 }
 
 export type AccountKind = 'bank' | 'upi' | 'cash' | 'card' | 'wallet' | 'other'
@@ -67,22 +109,12 @@ export interface MonthSetting {
 export type MotionLevel = 'full' | 'calm' | 'minimal'
 export type Judginess = 'chill' | 'normal' | 'strict'
 
-export interface NotificationPrefs {
-  enabled: boolean
-  eveningNudge: boolean
-  nudgeTime: TimeKey
-  bigDayAlert: boolean
-  bigDayThreshold: number
-  celebrateSaving: boolean
-}
-
 export interface Prefs {
   motion: MotionLevel
   mascotVisible: boolean
   reactions: boolean
   judginess: Judginess
   weekStartsOn: 0 | 1
-  notifications: NotificationPrefs
 }
 
 export interface Profile {
@@ -104,7 +136,12 @@ export interface Snapshot {
   accounts: Account[]
   categories: Category[]
   monthSettings: MonthSetting[]
+  /** The ledger's profile (Jais's), with the viewer's own prefs. */
   profile: Profile
+  comments: TransactionComment[]
+  members: Member[]
 }
 
-export type TransactionDraft = Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'> & { id?: string }
+export type TransactionDraft = Omit<Transaction, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy'> & {
+  id?: string
+}

@@ -168,6 +168,10 @@
   --hill-h: calc(104px + var(--safe-bottom));
   --nav-h: 64px;
   --content-max: 640px;
+  --rail-w: 0px;
+  /* gap between two-column layouts; widened to the hinge on dual-screen devices */
+  --hinge-gap: 0px;
+  --col-gap: max(var(--space-6), var(--hinge-gap));
 
   --z-world: 0;
   --z-content: 10;
@@ -181,11 +185,46 @@
   color-scheme: dark;
 }
 
+/* cover: folded Fold cover screen and other narrow phones */
+@media (max-width: 419px) {
+  :root {
+    --gutter: 14px;
+    --text-hero: clamp(2.5rem, 12.8vw, 3.2rem);
+    --hill-h: calc(98px + var(--safe-bottom));
+  }
+}
+
+/* open: unfolded Fold (~4:3) and small tablets — slim rail, wider content */
+@media (min-width: 700px) {
+  :root {
+    --gutter: 24px;
+    --rail-w: 92px;
+    --hill-h: 108px;
+    --content-max: 960px;
+    --text-hero: clamp(3.2rem, 6.4vw, 4.4rem);
+  }
+}
+
 @media (min-width: 1024px) {
   :root {
     --gutter: 28px;
+    --rail-w: 248px;
     --hill-h: 120px;
-    --content-max: 760px;
+    --content-max: 900px;
     --text-hero: clamp(3.5rem, 5vw, 4.75rem);
+  }
+}
+
+/* Short landscape screens: a slimmer hill so content keeps the room */
+@media (max-height: 520px) and (min-width: 600px) {
+  :root {
+    --hill-h: 84px;
+  }
+}
+
+/* Dual-screen / hinged devices that report two segments: keep columns off the hinge */
+@media (horizontal-viewport-segments: 2) {
+  :root {
+    --hinge-gap: calc(env(viewport-segment-left 1 0, 0px) - env(viewport-segment-right 0 0, 0px) + 24px);
   }
 }

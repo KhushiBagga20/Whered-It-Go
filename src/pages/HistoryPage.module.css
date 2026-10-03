@@ -81,20 +81,6 @@
   color: var(--on-sky-soft);
 }
 
-.catChip {
-  justify-self: start;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 0 14px 0 6px;
-  border-radius: var(--radius-pill);
-  background: var(--paper);
-  color: var(--ink-900);
-  border: 2.5px solid var(--ink-900);
-  font-weight: 800;
-}
-
 .tally {
   font-size: var(--text-sm);
   font-weight: 700;
@@ -153,4 +139,123 @@
 .list {
   display: grid;
   padding-top: 4px;
+}
+
+.selects {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.selIcon {
+  flex: none;
+  color: var(--on-sky-muted);
+}
+
+.select {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.select select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 34px 0 14px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--on-sky-line-strong);
+  background: rgba(19, 7, 42, 0.5)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23c9b6ef' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")
+    no-repeat right 14px center;
+  color: var(--on-sky);
+  font-weight: 700;
+  font-size: var(--text-sm);
+  appearance: none;
+  text-overflow: ellipsis;
+}
+
+.select select:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.select option,
+.select optgroup {
+  background: var(--sky-900);
+  color: var(--on-sky);
+}
+
+.clearAll {
+  margin-left: 10px;
+  min-height: 32px;
+  font-weight: 800;
+  color: var(--sun-300);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ── split view: list | evidence ──────────────────────────────── */
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.9fr);
+  column-gap: var(--col-gap);
+  align-items: start;
+}
+
+.detailCol {
+  position: sticky;
+  top: 96px;
+}
+
+.paper {
+  /* stop above the meadow so the bottom of the paper never hides in the grass */
+  max-height: calc(100dvh - 96px - var(--hill-h) - 56px);
+  overflow-y: auto;
+  padding: 16px 20px 20px;
+  background: var(--paper);
+  color: var(--on-paper);
+  border: 3px solid var(--ink-900);
+  border-radius: 26px;
+  box-shadow: 6px 8px 0 rgba(10, 2, 26, 0.4);
+  overscroll-behavior: contain;
+}
+
+.pick {
+  font-family: var(--font-hand);
+  font-size: 1.5rem;
+  color: var(--sun-300);
+}
+
+.item[data-selected] {
+  border-radius: 18px;
+  background: rgba(255, 210, 63, 0.1);
+  box-shadow: inset 0 0 0 2px rgba(255, 210, 63, 0.45);
+}
+
+.page[data-split] .controls {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+}
+
+.page[data-split] .selects {
+  grid-column: 1 / -1;
+}
+
+/* Only a really wide column fits all three on one line */
+@container content (min-width: 1000px) {
+  .page[data-split] .controls {
+    grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.1fr);
+  }
+  .page[data-split] .selects {
+    grid-column: auto;
+  }
+}
+
+/* Cover screen: one control per line, chunkier targets */
+@container content (max-width: 380px) {
+  .selects {
+    flex-wrap: wrap;
+  }
+  .selIcon {
+    display: none;
+  }
 }

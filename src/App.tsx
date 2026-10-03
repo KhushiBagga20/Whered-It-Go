@@ -14,22 +14,24 @@ import { Splash } from './components/Splash'
 import { Toasts } from './components/Toasts'
 import { TransactionComposer } from './components/TransactionComposer'
 import { TransactionDetail } from './components/TransactionDetail'
+import { WaitingForJais } from './components/WaitingForJais'
 import { Hill } from './components/world/Hill'
 import { Sun } from './components/world/Sun'
 import { World } from './components/world/World'
-import { useIsDesktop, useIsWide } from './hooks/useMedia'
+import { useLedgerSync } from './hooks/useLedgerSync'
+import { useLayout } from './hooks/useMedia'
+import { isCloudConfigured } from './lib/supabase'
 import { MascotSpot } from './mascot/MascotSpot'
 import { react } from './mascot/react'
 import Dashboard from './pages/Dashboard'
 import { startClock, useMonth, useMonthProgress } from './state/selectors'
-import { startNudgeWatcher } from './lib/notifications'
-import { isCloudConfigured } from './lib/supabase'
-import { boot, useData } from './state/store'
+import { boot, isObserver, useData } from './state/store'
 import { ui, useUi } from './state/ui'
 import styles from './App.module.css'
 
 const loadFeatures = () => import('./animations/features').then((r) => r.default)
 
+const ObserverDashboard = lazy(() => import('./pages/ObserverDashboard'))
 const CalendarPage = lazy(() => import('./pages/CalendarPage'))
 const HistoryPage = lazy(() => import('./pages/HistoryPage'))
 const MoneyPage = lazy(() => import('./pages/MoneyPage'))
@@ -52,16 +54,14 @@ export default function App() {
     document.documentElement.dataset.motion = motion
   }, [motion])
 
-  // Cloud: react to sign-in/out that happens elsewhere (magic link, another tab, expired session).
+  // Cloud: signed out somewhere else, or the session expired → back to "who are you?".
   useEffect(() => {
     if (!isCloudConfigured) return
     let unsub: (() => void) | undefined
     void import('./lib/supabase').then(async ({ getSupabase }) => {
       const sb = await getSupabase()
-      const { data } = sb.auth.onAuthStateChange((event, session) => {
-        const status = useData.getState().status
-        if (event === 'SIGNED_OUT' && status !== 'signed-out') void boot()
-        if (event === 'SIGNED_IN' && session && status === 'signed-out') void boot()
+      const { data } = sb.auth.onAuthStateChange((event) => {
+        if (event === 'SIGNED_OUT' && useData.getState().status !== 'signed-out') void boot()
       })
       unsub = () => data.subscription.unsubscribe()
     })
@@ -82,19 +82,25 @@ export default function App() {
           {status === 'signed-out' && <AuthPage />}
           {status === 'onboarding' && <Onboarding />}
         </Suspense>
+        {status === 'waiting' && <WaitingForJais />}
         {status === 'ready' && <Shell />}
       </MotionConfig>
     </LazyMotion>
   )
 }
 
+function Home() {
+  const observer = useData((s) => s.viewer?.role === 'observer')
+  return observer ? <ObserverDashboard /> : <Dashboard />
+}
+
 function Shell() {
-  const desktop = useIsDesktop()
-  const wide = useIsWide()
+  const layout = useLayout()
   const [location] = useLocation()
   const month = useMonth()
   const progress = useMonthProgress(month)
   const reaction = useUi((s) => s.reaction)
+  useLedgerSync()
 
   // Slide pages in the direction of travel along the nav.
   const index = navIndex(location)
@@ -105,24 +111,12 @@ function Shell() {
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
   }, [index])
 
-  // Nudges (only fire if the user turned them on and granted permission).
-  useEffect(
-    () =>
-      startNudgeWatcher(() => {
-        const s = useData.getState()
-        return { txns: s.transactions, prefs: s.profile.prefs.notifications }
-      }),
-    [],
-  )
-
-  // Home-screen shortcut: /?add=expense opens the composer straight away.
+  // Home-screen shortcut: /?add=expense opens the composer straight away (Jais only).
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const add = params.get('add')
-    if (add === 'expense' || add === 'income') {
-      ui.openComposer({ type: add })
-      window.history.replaceState(window.history.state, '', window.location.pathname)
-    }
+    if ((add === 'expense' || add === 'income') && !isObserver()) ui.openComposer({ type: add })
+    if (add) window.history.replaceState(window.history.state, '', window.location.pathname)
   }, [])
 
   // She says hi once per session.
@@ -136,15 +130,15 @@ function Shell() {
   }, [])
 
   return (
-    <div className={styles.shell} data-desktop={desktop || undefined} data-wide={wide || undefined}>
+    <div className={styles.shell} data-layout={layout.mode} data-rail={layout.rail || undefined}>
       <a href="#main" className={styles.skip}>
         Skip to content
       </a>
-      {desktop && <SideRail />}
+      {layout.rail && <SideRail compact={layout.compactRail} />}
       <div className={styles.main}>
-        {!wide && (
+        {!layout.aside && (
           <div className={styles.sun}>
-            <Sun progress={progress} size={desktop ? 120 : 104} />
+            <Sun progress={progress} size={layout.rail ? 120 : layout.mode === 'cover' ? 88 : 104} />
           </div>
         )}
         <Header />
@@ -153,14 +147,14 @@ function Shell() {
             <m.div key={location} custom={dir} variants={pageVariants} initial="enter" animate="center" exit="exit">
               <Suspense fallback={<div className={styles.loading} aria-busy="true" />}>
                 <Switch location={location}>
-                  <Route path="/" component={Dashboard} />
+                  <Route path="/" component={Home} />
                   <Route path="/calendar" component={CalendarPage} />
                   <Route path="/history" component={HistoryPage} />
                   <Route path="/money" component={MoneyPage} />
                   <Route path="/settings" component={SettingsPage} />
                   <Route path="/mascot" component={MascotGallery} />
                   <Route>
-                    <Dashboard />
+                    <Home />
                   </Route>
                 </Switch>
               </Suspense>
@@ -168,12 +162,12 @@ function Shell() {
           </AnimatePresence>
         </main>
       </div>
-      {wide && <Aside />}
-      <Hill desktop={desktop}>
-        {!desktop && <BottomNav />}
-        {!wide && (
+      {layout.aside && <Aside />}
+      <Hill desktop={layout.rail}>
+        {!layout.rail && <BottomNav />}
+        {!layout.aside && (
           <div className={styles.stage}>
-            <MascotSpot stage pose="sit" size={50} bubble={desktop ? 'left' : 'right'} />
+            <MascotSpot stage pose="sit" size={layout.mode === 'cover' ? 44 : 50} bubble={layout.rail ? 'left' : 'right'} />
           </div>
         )}
       </Hill>
