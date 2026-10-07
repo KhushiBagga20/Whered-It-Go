@@ -20,7 +20,7 @@ interface AccountEditorProps {
   account?: Account
 }
 
-/** Add or edit a place money lives: Bank, UPI, Cash, a wallet… */
+/** Add or edit a place money lives: Bank / UPI, Cash, a wallet… */
 export function AccountEditor(props: AccountEditorProps) {
   return <AccountEditorSheet key={useOpenKey(props.open)} {...props} />
 }

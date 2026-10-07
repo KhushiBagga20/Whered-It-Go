@@ -42,7 +42,7 @@ Khushi gets her own home screen, **The evidence** (*Still got · Current damage 
 
 ## Turn on cloud sync (Supabase)
 
-Everything — migrations, creating the two users, PINs, the Edge Function, Vercel — is in **[DEPLOYMENT.md](DEPLOYMENT.md)**. Short version: run the three migrations, create two auth users, `select private.setup_ledger(...)`, `select private.set_pin(...)` ×2, deploy `pin-login` with `--no-verify-jwt`, put `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` in `.env.local` / Vercel.
+Everything — migrations, creating the two users, PINs, the Edge Function, Vercel — is in **[DEPLOYMENT.md](DEPLOYMENT.md)**. Short version: run the migrations, create two auth users, `select private.setup_ledger(...)`, `select private.set_pin(...)` ×2, deploy `pin-login` with `--no-verify-jwt`, put `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` in `.env.local` / Vercel.
 
 Demo data never goes to Supabase. In cloud mode the last snapshot is cached on the device, so the app opens instantly and still reads offline; writes need a connection (a failed save rolls back and says why).
 
@@ -97,7 +97,7 @@ src/
   animations/   shared motion variants, burst particles
   styles/       tokens.css (the palette + scales + breakpoints), global.css
 supabase/
-  migrations/   init → tracking_since → two_person_ledger
+  migrations/   init → tracking_since → two_person_ledger → bank_upi_one_account
   functions/    pin-login (Edge Function: PIN → session)
   tests/        RLS + PIN tests on PGlite
 icon-source/    where the real app icon goes (docs/app-icon.md)

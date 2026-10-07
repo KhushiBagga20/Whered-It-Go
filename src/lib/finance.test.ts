@@ -111,8 +111,7 @@ describe('accounts', () => {
     }
     const sept = calculateAccountBalances(ledger, '2026-09')
     expect(sept.map((p) => [p.account.name, p.balance])).toEqual([
-      ['Bank', 5600],
-      ['UPI', 1670],
+      ['Bank / UPI', 7270],
       ['Cash', 300],
     ])
   })

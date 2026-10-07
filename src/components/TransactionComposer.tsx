@@ -102,7 +102,7 @@ function ComposerSheet() {
   const accounts = useActiveAccounts()
   const editing = composer.editId ? transactions.find((t) => t.id === composer.editId) : undefined
 
-  const fallbackAccount = (accounts.find((a) => a.kind === 'upi') ?? accounts[0])?.id ?? ''
+  const fallbackAccount = (accounts.find((a) => a.kind === 'bank') ?? accounts[0])?.id ?? ''
   const [f, setF] = useState<FormState>(() => initialForm(editing, composer.preset, transactions, fallbackAccount))
   const [errors, setErrors] = useState<FieldErrors>({})
   const [overdraftOk, setOverdraftOk] = useState(false)

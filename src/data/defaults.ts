@@ -53,16 +53,20 @@ export function buildDefaultCategories(): Category[] {
   return [...make(DEFAULT_EXPENSE_CATEGORIES, 'expense'), ...make(DEFAULT_INCOME_CATEGORIES, 'income')]
 }
 
+/** The kinds you can pick. UPI money is bank money, so the two are one kind. */
 export const ACCOUNT_KINDS: { kind: AccountKind; label: string; icon: string; color: number }[] = [
-  { kind: 'bank', label: 'Bank', icon: 'landmark', color: 8 },
-  { kind: 'upi', label: 'UPI', icon: 'smartphone', color: 5 },
+  { kind: 'bank', label: 'Bank / UPI', icon: 'landmark', color: 8 },
   { kind: 'cash', label: 'Cash', icon: 'banknote', color: 3 },
   { kind: 'card', label: 'Card', icon: 'credit-card', color: 2 },
   { kind: 'wallet', label: 'Wallet', icon: 'wallet', color: 1 },
   { kind: 'other', label: 'Other', icon: 'piggy-bank', color: 6 },
 ]
 
+// A separate UPI account from before the two were combined keeps its own look.
+const LEGACY_UPI = { kind: 'upi', label: 'UPI', icon: 'smartphone', color: 5 } as const
+
 export function accountKindMeta(kind: AccountKind) {
+  if (kind === 'upi') return LEGACY_UPI
   return ACCOUNT_KINDS.find((k) => k.kind === kind) ?? ACCOUNT_KINDS[ACCOUNT_KINDS.length - 1]
 }
 
@@ -81,12 +85,8 @@ export function buildAccount(name: string, kind: AccountKind, openingBalance: nu
   }
 }
 
-export function buildDefaultAccounts(balances: { bank: number; upi: number; cash: number }): Account[] {
-  return [
-    buildAccount('Bank', 'bank', balances.bank, 0),
-    buildAccount('UPI', 'upi', balances.upi, 1),
-    buildAccount('Cash', 'cash', balances.cash, 2),
-  ]
+export function buildDefaultAccounts(balances: { bank: number; cash: number }): Account[] {
+  return [buildAccount('Bank / UPI', 'bank', balances.bank, 0), buildAccount('Cash', 'cash', balances.cash, 1)]
 }
 
 export const DEFAULT_PREFS: Prefs = {

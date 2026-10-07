@@ -85,7 +85,7 @@ export default function MoneyPage() {
       {active.length === 0 && (
         <EmptyState
           title="Where are we keeping the money?"
-          line={owner ? 'Add a bank, UPI or cash pocket below.' : 'Jais hasn’t added any accounts yet.'}
+          line={owner ? 'Add a bank or cash pocket below.' : 'Jais hasn’t added any accounts yet.'}
           expression="suspicious"
           size={64}
         />

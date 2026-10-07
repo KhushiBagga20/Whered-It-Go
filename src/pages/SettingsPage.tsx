@@ -236,7 +236,7 @@ export default function SettingsPage() {
       {owner && (
         <Panel title="Accounts">
           <Link href="/money" className={styles.linkRow}>
-            <Wallet size={20} /> Manage Bank, UPI, Cash & friends <ChevronRight size={18} className={styles.chev} />
+            <Wallet size={20} /> Manage Bank / UPI, Cash & friends <ChevronRight size={18} className={styles.chev} />
           </Link>
         </Panel>
       )}

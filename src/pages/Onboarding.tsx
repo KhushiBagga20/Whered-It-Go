@@ -12,8 +12,7 @@ import { completeOnboarding, useData } from '../state/store'
 import styles from './Onboarding.module.css'
 
 const SOURCES = [
-  { key: 'bank', label: 'Bank', icon: 'landmark', color: 8 },
-  { key: 'upi', label: 'UPI', icon: 'smartphone', color: 5 },
+  { key: 'bank', label: 'Bank / UPI', icon: 'landmark', color: 8 },
   { key: 'cash', label: 'Cash', icon: 'banknote', color: 3 },
 ] as const
 
@@ -24,13 +23,12 @@ export default function Onboarding() {
   const month = currentMonthKey()
   const [, navigate] = useLocation()
   const [name, setName] = useState('')
-  const [values, setValues] = useState({ bank: '', upi: '', cash: '' })
+  const [values, setValues] = useState({ bank: '', cash: '' })
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<{ message: string; detail?: string } | null>(null)
 
   const amounts = {
     bank: values.bank ? parseAmount(values.bank) : 0,
-    upi: values.upi ? parseAmount(values.upi) : 0,
     cash: values.cash ? parseAmount(values.cash) : 0,
   }
   const total = sumRupees(Object.values(amounts).map((v) => (Number.isNaN(v) ? 0 : v)))

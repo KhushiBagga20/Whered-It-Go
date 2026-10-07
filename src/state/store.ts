@@ -448,7 +448,7 @@ export interface OnboardingInput {
   displayName: string
   mascotName: string
   startMonth: MonthKey
-  balances: { bank: number; upi: number; cash: number }
+  balances: { bank: number; cash: number }
 }
 
 export async function completeOnboarding(input: OnboardingInput) {

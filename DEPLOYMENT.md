@@ -20,8 +20,9 @@ Supabase dashboard → **SQL Editor** → paste each file → **Run**, in this o
 1. `supabase/migrations/20260923000000_init.sql`
 2. `supabase/migrations/20260924000000_profiles_tracking_since.sql`
 3. `supabase/migrations/20261002000000_two_person_ledger.sql`
+4. `supabase/migrations/20261007000000_bank_upi_one_account.sql`
 
-All three can safely be run more than once. If the first two already ran when you set the database up, run them again anyway or skip them; either is fine.
+All four can safely be run more than once. If the first two already ran when you set the database up, run them again anyway or skip them; either is fine.
 
 With the CLI instead:
 
@@ -38,6 +39,13 @@ Migration 3 adds:
 - the new RLS policies.
 
 It also adds `transactions` and `transaction_comments` to Realtime, so notes and edits show up live on the other phone.
+
+Migration 4 folds any separate UPI account into the bank account, because UPI money is bank money:
+- its transactions move across and the two opening balances are added together;
+- totals don’t change, and nothing is marked as edited;
+- it keeps the old rows in `private.bank_upi_merge_backup`.
+
+On a new database it does nothing.
 
 ## 2. Create the two people
 
@@ -169,7 +177,7 @@ npm test          # includes RLS + PIN tests against a real Postgres (PGlite), n
 npm run build
 ```
 
-`supabase/tests/rls.test.ts` runs all three migrations against an in-memory Postgres and proves the permission table above: Khushi can’t insert, delete, move or manage anything, nobody can edit notes, strangers and anonymous callers see nothing, and the PIN lockout works.
+`supabase/tests/rls.test.ts` runs every migration against an in-memory Postgres and proves the permission table above: Khushi can’t insert, delete, move or manage anything, nobody can edit notes, strangers and anonymous callers see nothing, and the PIN lockout works.
 
 ## Environment variables, all of them
 

@@ -100,7 +100,7 @@ describe('mascot reactions', () => {
 
 describe('validation', () => {
   const categories = buildDefaultCategories()
-  const accounts = buildDefaultAccounts({ bank: 0, upi: 0, cash: 0 })
+  const accounts = buildDefaultAccounts({ bank: 0, cash: 0 })
   const food = categories.find((c) => c.key === 'food')!
   const family = categories.find((c) => c.key === 'family')!
   const base = {
