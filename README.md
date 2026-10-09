@@ -74,6 +74,7 @@ current(M) = start(M) + received(M) − spent(M)
 So **rollover is automatic** (October starts with September’s ending), and editing or deleting any transaction moves every number — balances, account balances, the chart, the calendar, streaks — at once. Arithmetic runs in integer paise.
 
 - **Accounts** hold an opening balance “as of the first tracked month”. Σ account balances always equals the dashboard’s *Still got*.
+- **Fixing an account’s amount**: tap it on the Money page and type what’s really in it. The difference corrects the account’s opening balance, so it is never counted as income or spending (and it shifts earlier months by the same amount).
 - **Adjusting a month’s start** (“September actually started with ₹8,300”) is booked against one account, so the dashboard and accounts keep agreeing. It isn’t counted as income or spending.
 - Expenses that would take an account below zero get a warning and need a second tap.
 

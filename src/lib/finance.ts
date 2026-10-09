@@ -277,6 +277,18 @@ export function calculateAccountBalance(ledger: Ledger, accountId: string, asOf:
   return fromPaise(toPaise(account.openingBalance) + txns + adjustments)
 }
 
+/**
+ * "This account actually has ₹X": the opening balance that makes it hold
+ * `desired` at the end of `month`. It corrects where the account started,
+ * so it never shows up as money in or as spending.
+ */
+export function openingBalanceFor(ledger: Ledger, accountId: string, month: MonthKey, desired: number): number {
+  const account = ledger.accounts.find((a) => a.id === accountId)
+  if (!account) return desired
+  const current = calculateAccountBalance(ledger, accountId, lastDayOfMonth(month))
+  return fromPaise(toPaise(account.openingBalance) + toPaise(desired) - toPaise(current))
+}
+
 export interface AccountPosition {
   account: Account
   balance: number

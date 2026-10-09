@@ -15,6 +15,7 @@ import {
   calculateStartingBalance,
   calculateTotalAvailable,
   groupTransactionsByDay,
+  openingBalanceFor,
   summarizeMonth,
   type Ledger,
 } from './finance'
@@ -114,6 +115,26 @@ describe('accounts', () => {
       ['Bank / UPI', 7270],
       ['Cash', 300],
     ])
+  })
+
+  it('setting what an account really has corrects its start, not the spending', () => {
+    const cash = demo.accounts.find((a) => a.kind === 'cash')!
+    const bank = demo.accounts.find((a) => a.kind === 'bank')!
+    const before = summarizeMonth(ledger, '2026-09')
+    // Cash shows ₹300 at the end of September; the wallet really has ₹450.50.
+    const opening = openingBalanceFor(ledger, cash.id, '2026-09', 450.5)
+    expect(opening).toBe(cash.openingBalance + 150.5)
+    const fixed: Ledger = { ...ledger, accounts: ledger.accounts.map((a) => (a.id === cash.id ? { ...a, openingBalance: opening } : a)) }
+    const positions = calculateAccountBalances(fixed, '2026-09')
+    expect(positions.find((p) => p.account.id === cash.id)!.balance).toBe(450.5)
+    expect(positions.find((p) => p.account.id === bank.id)!.balance).toBe(7270)
+    const after = summarizeMonth(fixed, '2026-09')
+    expect([after.received, after.spent]).toEqual([before.received, before.spent])
+    expect(after.current).toBe(before.current + 150.5)
+    expect(calculateTotalAvailable(positions)).toBe(after.current)
+    // lowering works too, and typing the same number changes nothing
+    expect(openingBalanceFor(ledger, cash.id, '2026-09', 0)).toBe(cash.openingBalance - 300)
+    expect(openingBalanceFor(ledger, cash.id, '2026-09', 300)).toBe(cash.openingBalance)
   })
 
   it('cash never dips below zero in the demo', () => {

@@ -3,9 +3,11 @@ import { useRef, useState } from 'react'
 import { useOpenKey } from '../hooks/useOpenKey'
 import { ACCOUNT_KINDS, buildAccount } from '../data/defaults'
 import type { Account, AccountKind } from '../data/types'
-import { monthLabel } from '../lib/dates'
-import { formatINR, parseAmount, sanitizeAmountInput } from '../lib/money'
+import { lastDayOfMonth, monthLabel } from '../lib/dates'
+import { calculateAccountBalance, openingBalanceFor } from '../lib/finance'
+import { formatINR, fromPaise, parseAmount, sanitizeAmountInput, toPaise } from '../lib/money'
 import { validateName } from '../lib/validation'
+import { useLedger, useToday } from '../state/selectors'
 import { removeAccount, saveAccount, useData } from '../state/store'
 import { ui } from '../state/ui'
 import { Button } from './ui/Button'
@@ -33,12 +35,22 @@ function AccountEditorSheet({ open, onClose, account }: AccountEditorProps) {
       ? s.transactions.some((t) => t.accountId === account.id) || s.monthSettings.some((m) => m.adjustmentAccountId === account.id)
       : false,
   )
+  const ledger = useLedger()
+  const month = useToday().slice(0, 7)
+  // What the Money page shows for this account today.
+  const current = account ? calculateAccountBalance(ledger, account.id, lastDayOfMonth(month)) : 0
   const [name, setName] = useState(account?.name ?? '')
   const [kind, setKind] = useState<AccountKind>(account?.kind ?? 'wallet')
-  const [opening, setOpening] = useState(account ? String(account.openingBalance) : '')
+  // A new account: what it opened with. An existing one: what's in it right now.
+  const [amount, setAmount] = useState(account ? String(current) : '')
+  const [amountEdited, setAmountEdited] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const nameRef = useRef<HTMLInputElement>(null)
+  const amountRef = useRef<HTMLInputElement>(null)
+
+  const typed = amount.trim() === '' ? 0 : parseAmount(amount)
+  const correction = account && amountEdited && !Number.isNaN(typed) ? fromPaise(toPaise(typed) - toPaise(current)) : 0
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -52,17 +64,25 @@ function AccountEditorSheet({ open, onClose, account }: AccountEditorProps) {
       nameRef.current?.focus()
       return
     }
-    const amount = opening.trim() === '' ? 0 : parseAmount(opening)
-    if (Number.isNaN(amount)) {
-      setError('The opening balance needs to be a number.')
+    if (Number.isNaN(typed)) {
+      setError(account ? 'The amount needs to be a number.' : 'The opening balance needs to be a number.')
       return
     }
     setSaving(true)
+    // Typing a new amount corrects what the account started with; a rename alone leaves the money alone.
     const next: Account = account
-      ? { ...account, name: name.trim(), kind, openingBalance: amount }
-      : buildAccount(name.trim(), kind, amount, Math.max(-1, ...accounts.map((a) => a.sortOrder)) + 1)
+      ? {
+          ...account,
+          name: name.trim(),
+          kind,
+          openingBalance: amountEdited ? openingBalanceFor(ledger, account.id, month, typed) : account.openingBalance,
+        }
+      : buildAccount(name.trim(), kind, typed, Math.max(-1, ...accounts.map((a) => a.sortOrder)) + 1)
     try {
       await saveAccount(next)
+      if (account && next.openingBalance !== account.openingBalance) {
+        ui.toast(`${next.name} now has ${formatINR(typed)}.`, { tone: 'success' })
+      }
       onClose()
     } catch {
       setSaving(false)
@@ -87,7 +107,7 @@ function AccountEditorSheet({ open, onClose, account }: AccountEditorProps) {
       open={open}
       onClose={onClose}
       title={account ? `Edit ${account.name}` : 'New place for money'}
-      initialFocus={nameRef}
+      initialFocus={account ? amountRef : nameRef}
       width={480}
       footer={
         <div className={styles.footer}>
@@ -150,19 +170,28 @@ function AccountEditorSheet({ open, onClose, account }: AccountEditorProps) {
         </div>
         <div className={form.field}>
           <label className={form.label} htmlFor="account-opening">
-            Had at the start of {monthLabel(startMonth, false)}
+            {account ? 'In it right now' : `Had at the start of ${monthLabel(startMonth, false)}`}
           </label>
           <input
+            ref={amountRef}
             id="account-opening"
             className={form.input}
             inputMode="decimal"
             placeholder="0"
-            value={opening}
-            onChange={(e) => setOpening(sanitizeAmountInput(e.target.value))}
+            value={amount}
+            onFocus={account ? (e) => e.target.select() : undefined}
+            onChange={(e) => {
+              setAmount(sanitizeAmountInput(e.target.value))
+              setAmountEdited(true)
+              setError(null)
+            }}
           />
           <p className={form.hint}>
-            Everything since then is worked out from your transactions
-            {account ? ` (currently opening at ${formatINR(account.openingBalance)})` : ''}.
+            {!account
+              ? 'Everything since then is worked out from your transactions.'
+              : correction !== 0
+                ? `${formatINR(correction, { sign: 'always' })} correction to what ${account.name} started with. Not counted as money in or as spending.`
+                : 'Type what’s really in there. The difference isn’t counted as money in or as spending.'}
           </p>
         </div>
         {error && (
